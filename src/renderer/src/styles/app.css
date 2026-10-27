@@ -1292,3 +1292,56 @@
 .idea {
   font-weight: 500;
 }
+
+/* ---------- Tour ---------- */
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: rgba(43, 35, 64, 0.45);
+  padding: 24px;
+}
+.tour__card {
+  width: min(680px, 100%);
+  background: var(--surface);
+  border-radius: calc(var(--radius) * 1.5);
+  box-shadow: var(--shadow);
+  padding: 36px 40px;
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  text-align: center;
+  animation: pop-in 0.3s ease-out;
+}
+.tour__icon {
+  font-size: 84px;
+  line-height: 1.1;
+  animation: bob 2.4s ease-in-out infinite;
+}
+.tour__text {
+  margin: 0;
+  font-size: var(--text-lg);
+  line-height: 1.6;
+}
+.tour__text .speak-button {
+  vertical-align: middle;
+}
+.tour__dots {
+  display: flex;
+  gap: 10px;
+}
+.tour__dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--line);
+}
+.tour__dot--on {
+  background: var(--grape);
+}
+.tour__buttons {
+  display: flex;
+  gap: 16px;
+}
