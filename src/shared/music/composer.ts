@@ -25,6 +25,7 @@ import {
   type ScaleName
 } from './theory'
 import { NOTE_NAMES, SECTION_KINDS } from '../project'
+import { detectKey } from './hum'
 
 // The composer turns lyrics + style into a SongPlan. The AI does the creative part; everything it
 // returns is checked and repaired here, and `fallbackPlan` can write a whole song with no AI at all.
@@ -352,8 +353,9 @@ export function composerMessages(
           .join('\n')}`
     )
     .join('\n\n')
+  const humKey = project.hum?.notes.length ? detectKey(project.hum.notes) : null
   const hum = project.hum?.notes.length
-    ? `\nShe hummed this tune — base the chorus melody on it (MIDI pitch@beat:length): ${project.hum.notes
+    ? `\nShe hummed a tune in ${humKey!.key} ${humKey!.scale} — use that key, and base the chorus melody on her tune, fitting her words to it (MIDI pitch@beat:length): ${project.hum.notes
         .slice(0, 48)
         .map((n) => `${n.pitch}@${n.start}:${n.duration}`)
         .join(' ')}`
