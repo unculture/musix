@@ -3,6 +3,12 @@ import type { LyricSection } from '../project'
 import { fallbackPlan } from './composer'
 import {
   addInstrumental,
+  addNote,
+  deleteNote,
+  melodyRows,
+  resizeNote,
+  shiftNote,
+  stepNote,
   chordChoices,
   deleteSection,
   duplicateSection,
@@ -72,5 +78,27 @@ describe('edits', () => {
     const more = addInstrumental(plan, 2)
     expect(more.sections[2].melody).toEqual([])
     expect(more.sections[2].chords).toHaveLength(4)
+  })
+})
+
+describe('melody edits', () => {
+  const si = plan.sections.findIndex((s) => s.melody.length > 1)
+  const first = plan.sections[si].melody[0]
+
+  it('steps notes through the scale only', () => {
+    const rows = melodyRows(plan)
+    const up = stepNote(plan, si, 0, 1).sections[si].melody[0]
+    expect(rows.indexOf(up.pitch)).toBe(rows.indexOf(first.pitch) + 1)
+  })
+
+  it('moves, resizes, adds and deletes within the section', () => {
+    const beats = plan.sections[si].bars * 4
+    expect(shiftNote(plan, si, 0, -10).sections[si].melody[0].start).toBe(0)
+    expect(resizeNote(plan, si, 0, -5).sections[si].melody[0].duration).toBe(0.5)
+    const added = addNote(plan, si, beats - 0.5, melodyRows(plan)[3], 4).sections[si].melody
+    expect(added.at(-1)!.duration).toBe(0.5)
+    expect(deleteNote(plan, si, 0).sections[si].melody).toHaveLength(
+      plan.sections[si].melody.length - 1
+    )
   })
 })

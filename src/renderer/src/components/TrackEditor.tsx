@@ -23,14 +23,16 @@ import { previewInstrument } from '@/audio/preview'
 import { SECTION_INFO } from '@/lib/lyrics'
 import { speak } from '@/lib/speech'
 import { useProject } from '@/state/project'
+import { MelodyEditor } from './MelodyEditor'
 import { useHoverSpeak } from './Speakable'
 
-type Tab = 'mix' | 'sounds' | 'parts' | 'speed'
+type Tab = 'mix' | 'sounds' | 'parts' | 'tune' | 'speed'
 
 const TABS: { id: Tab; icon: string; label: string }[] = [
   { id: 'mix', icon: '🎚️', label: 'Loud or quiet' },
   { id: 'sounds', icon: '🎸', label: 'Instruments' },
   { id: 'parts', icon: '🧱', label: 'Song parts' },
+  { id: 'tune', icon: '🎵', label: 'The tune' },
   { id: 'speed', icon: '🐇', label: 'Speed and voice' }
 ]
 
@@ -365,6 +367,35 @@ export function TrackEditor(): React.JSX.Element {
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {tab === 'tune' && (
+        <div className="parts">
+          <div className="parts__strip">
+            {plan.sections.map((s, i) => {
+              const info = SECTION_INFO[s.kind]
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={`parts__block${i === sel ? ' parts__block--on' : ''}`}
+                  style={
+                    {
+                      '--sec': info.color,
+                      '--sec-soft': info.soft,
+                      flexGrow: s.bars
+                    } as CSSProperties
+                  }
+                  onClick={() => setSelected(i)}
+                >
+                  <span aria-hidden>{info.icon}</span>
+                  <span className="parts__label">{info.label}</span>
+                </button>
+              )
+            })}
+          </div>
+          <MelodyEditor key={sel} plan={plan} section={sel} edit={edit} />
         </div>
       )}
 
