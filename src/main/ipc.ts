@@ -72,7 +72,7 @@ export function registerIpc(): void {
   )
 
   ipcMain.handle('media:askMic', async () => {
-    if (process.platform !== 'darwin') return true
+    if (process.platform !== 'darwin' || process.env['MUSIX_FAKE_MIC']) return true
     if (systemPreferences.getMediaAccessStatus('microphone') === 'granted') return true
     return systemPreferences.askForMediaAccess('microphone')
   })
