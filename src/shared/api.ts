@@ -8,12 +8,15 @@ export interface ModelSettings {
   transcribe: string
   /** Music generation (audio output). */
   music: string
+  /** Cover pictures (image output). */
+  image: string
 }
 
 export const DEFAULT_MODELS: ModelSettings = {
   text: 'google/gemini-3.5-flash',
   transcribe: 'google/gemini-3.5-flash',
-  music: 'google/lyria-3-pro-preview'
+  music: 'google/lyria-3-pro-preview',
+  image: 'google/gemini-3.1-flash-image'
 }
 
 export interface PublicSettings {
@@ -120,5 +123,7 @@ export interface MusixApi {
     transcribe(req: TranscribeRequest): Promise<Result<string>>
     /** Generate a music track with the music model and save it in the song's audio folder. */
     music(projectId: string, prompt: string): Promise<Result<string>>
+    /** Draw a cover picture and save it with the song. Counts towards the daily magic limit. */
+    cover(projectId: string, prompt: string): Promise<Result<string>>
   }
 }

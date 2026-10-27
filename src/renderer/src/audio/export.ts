@@ -24,7 +24,8 @@ export async function renderSong(project: Project, duration: number): Promise<Au
 export function encodeInWorker(
   buffer: AudioBuffer,
   title: string,
-  onProgress?: (f: number) => void
+  onProgress?: (f: number) => void,
+  cover?: Uint8Array
 ): Promise<Uint8Array> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(new URL('./mp3.worker.ts', import.meta.url), { type: 'module' })
@@ -46,7 +47,12 @@ export function encodeInWorker(
       buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : buffer.getChannelData(0)
     ).slice()
     worker.postMessage(
-      { left, right, sampleRate: buffer.sampleRate, meta: { title, artist: 'Made with Musix' } },
+      {
+        left,
+        right,
+        sampleRate: buffer.sampleRate,
+        meta: { title, artist: 'Made with Musix', cover }
+      },
       [left.buffer, right.buffer]
     )
   })

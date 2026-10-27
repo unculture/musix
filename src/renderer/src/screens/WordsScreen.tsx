@@ -1,6 +1,7 @@
 import { useEffect, type CSSProperties } from 'react'
 import type { LyricSection, SectionKind } from '@shared/project'
 import { BigButton } from '@/components/BigButton'
+import { LyricIdeas } from '@/components/LyricIdeas'
 import { MicButton } from '@/components/MicButton'
 import { SpeakButton } from '@/components/Speakable'
 import { StepScreen } from '@/components/StepScreen'
@@ -91,6 +92,16 @@ function SectionCard({
       />
       <div className="lyric-card__foot">
         <MicButton onText={(said) => setText(appendText(text, said))} hint={LYRIC_HINT} />
+        <LyricIdeas
+          text={text}
+          onAdd={(addition, asNewLine) =>
+            setText(
+              asNewLine || !text.trim()
+                ? appendText(text, addition)
+                : `${text.replace(/\s+$/, '')} ${addition}`
+            )
+          }
+        />
       </div>
     </div>
   )

@@ -44,9 +44,13 @@ export function SongCard({
       }
     >
       <button type="button" className="song-card__open" onClick={onOpen} {...hover}>
-        <span className="song-card__emoji" aria-hidden>
-          {song.emoji}
-        </span>
+        {song.cover ? (
+          <img className="song-card__cover" src={`musix://song/${song.id}/${song.cover}`} alt="" />
+        ) : (
+          <span className="song-card__emoji" aria-hidden>
+            {song.emoji}
+          </span>
+        )}
         {!editing && <span className="song-card__title">{song.title}</span>}
         <span className="song-card__when">
           {song.hasSong ? '🎧 ' : '✏️ '}

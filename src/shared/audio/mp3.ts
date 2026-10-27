@@ -3,6 +3,8 @@ import { Mp3Encoder } from '@breezystack/lamejs'
 export interface Mp3Meta {
   title?: string
   artist?: string
+  /** Cover picture (PNG or JPEG bytes). */
+  cover?: Uint8Array
 }
 
 const BLOCK = 1152
@@ -38,6 +40,22 @@ export function id3(meta: Mp3Meta): Uint8Array {
   if (meta.title) frame('TIT2', meta.title)
   if (meta.artist) frame('TPE1', meta.artist)
   frame('TSSE', 'Musix')
+  if (meta.cover?.length) {
+    const png = meta.cover[0] === 0x89
+    const mime = png ? 'image/png' : 'image/jpeg'
+    // APIC: encoding, MIME type, NUL, picture type 3 (front cover), empty description, image data.
+    const body = new Uint8Array(1 + mime.length + 1 + 1 + 1 + meta.cover.length)
+    let o = 1
+    for (let i = 0; i < mime.length; i++) body[o++] = mime.charCodeAt(i)
+    body[o++] = 0
+    body[o++] = 3
+    body[o++] = 0
+    body.set(meta.cover, o)
+    const header = new Uint8Array(10)
+    for (let i = 0; i < 4; i++) header[i] = 'APIC'.charCodeAt(i)
+    new DataView(header.buffer).setUint32(4, body.length)
+    frames.push(header, body)
+  }
   const size = frames.reduce((t, f) => t + f.length, 0)
   const header = new Uint8Array([
     0x49,

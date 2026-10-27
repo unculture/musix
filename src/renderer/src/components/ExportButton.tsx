@@ -24,8 +24,16 @@ export function ExportButton(): React.JSX.Element {
     try {
       const buffer = await renderSong(project, duration)
       setStage({ kind: 'encoding', fraction: 0 })
-      const mp3 = await encodeInWorker(buffer, project.title, (fraction) =>
-        setStage({ kind: 'encoding', fraction })
+      const cover = project.cover
+        ? new Uint8Array(
+            await (await fetch(`musix://song/${project.id}/${project.cover}`)).arrayBuffer()
+          )
+        : undefined
+      const mp3 = await encodeInWorker(
+        buffer,
+        project.title,
+        (fraction) => setStage({ kind: 'encoding', fraction }),
+        cover
       )
       const path = await window.musix.files.saveMp3(mp3, project.title)
       if (!path) {

@@ -71,6 +71,15 @@ export function registerIpc(): void {
       return projects.writeAudio(projectId, `magic-${Date.now()}.mp3`, mp3)
     })
   )
+  ipcMain.handle('ai:cover', (_e, projectId: string, prompt: string) =>
+    wrap(async () => {
+      const key = requireKey()
+      if (magicLeft() <= 0) throw new Error('MAGIC_LIMIT')
+      const image = await openrouter.generateImage(key, prompt, getModels().image)
+      recordMagicUse()
+      return projects.writeAudio(projectId, `cover-${Date.now()}.png`, image)
+    })
+  )
   ipcMain.handle('ai:chat', (_e, req: ChatRequest) =>
     wrap(() => openrouter.chat(requireKey(), req, getModels().text))
   )

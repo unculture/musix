@@ -132,7 +132,9 @@ export const Project = z.object({
   style: StyleChoice,
   hum: HumTake.optional(),
   plan: SongPlan.optional(),
-  layers: z.array(AudioLayer).default([])
+  layers: z.array(AudioLayer).default([]),
+  /** Cover picture file in the song's media folder. */
+  cover: z.string().optional()
 })
 export type Project = z.infer<typeof Project>
 
@@ -143,6 +145,7 @@ export interface ProjectSummary {
   color: string
   updatedAt: string
   hasSong: boolean
+  cover?: string
 }
 
 export function summarise(p: Project): ProjectSummary {
