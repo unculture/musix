@@ -10,7 +10,16 @@ permissions:
   contents: write
 
 jobs:
+  # Create the release once, so the macOS and Windows builds upload into the same one.
+  create:
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "${GITHUB_REF_NAME#v}" --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   release:
+    needs: create
     strategy:
       matrix:
         os: [macos-latest, windows-latest]
