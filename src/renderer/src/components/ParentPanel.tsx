@@ -80,6 +80,20 @@ export function ParentPanel(): React.JSX.Element {
               : '❌')}
         </div>
       )}
+      <label className="parent-panel__row">
+        <strong>Magic band tracks per day:</strong>
+        <input
+          type="number"
+          min={0}
+          max={100}
+          style={{ maxWidth: 90, flex: 'none' }}
+          value={settings.magicPerDay}
+          onChange={async (e) =>
+            setSettings(await window.musix.settings.setMagicPerDay(Number(e.target.value)))
+          }
+        />
+        <span>({settings.magicLeft} left today · about $0.08 each)</span>
+      </label>
       <details>
         <summary>Advanced: AI models</summary>
         {(Object.keys(models) as (keyof ModelSettings)[]).map((name) => (
