@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useRef, useState, type CSSProperties } from 'react'
 import * as Tone from 'tone'
 import type { Note } from '@shared/project'
 import { humToMelody } from '@shared/music/hum'
@@ -48,12 +48,11 @@ export function HumScreen(): React.JSX.Element {
   const [saved, setSaved] = useState(Boolean(project.hum))
   const stopClicks = useRef<(() => void) | null>(null)
 
-  useEffect(() => {
-    warmUp()
-  }, [])
-
   const record = async (): Promise<void> => {
     setStage('counting')
+    // Get the tune detector ready during the count-in. Doing it when the screen opens froze
+    // the buttons for a few seconds on slower laptops.
+    warmUp()
     speak('Get ready… hum after four clicks.')
     await new Promise((r) => setTimeout(r, 1800))
     await countIn(bpm)
