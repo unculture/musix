@@ -1,7 +1,13 @@
 import { app, BrowserWindow, dialog, ipcMain, shell, systemPreferences } from 'electron'
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import type { ChatRequest, ModelSettings, Result, TranscribeRequest } from '@shared/api'
+import type {
+  ChatRequest,
+  ModelSettings,
+  Result,
+  TranscribeRequest,
+  VoiceSettings
+} from '@shared/api'
 import type { Project } from '@shared/project'
 import * as openrouter from './openrouter'
 import * as projects from './projects'
@@ -10,12 +16,15 @@ import {
   getApiKey,
   getModels,
   getPublicSettings,
+  getVoice,
   magicLeft,
   setApiKey,
   setMagicPerDay,
   setModels,
+  setVoice,
   recordMagicUse
 } from './settings'
+import { speakNatural } from './voice'
 
 async function wrap<T>(fn: () => Promise<T>): Promise<Result<T>> {
   try {
@@ -62,6 +71,10 @@ export function registerIpc(): void {
     setMagicPerDay(n)
     return getPublicSettings()
   })
+  ipcMain.handle('settings:setVoice', (_e, voice: Partial<VoiceSettings>) => {
+    setVoice(voice)
+    return getPublicSettings()
+  })
   ipcMain.handle('ai:music', (_e, projectId: string, prompt: string) =>
     wrap(async () => {
       const key = requireKey()
@@ -83,6 +96,17 @@ export function registerIpc(): void {
   ipcMain.handle('ai:chat', (_e, req: ChatRequest) =>
     wrap(() => openrouter.chat(requireKey(), req, getModels().text))
   )
+  // Not wrapped: falling back to the computer's voice is normal (offline, no key, switched off).
+  ipcMain.handle('ai:speak', async (_e, text: string): Promise<Result<Uint8Array>> => {
+    const voice = getVoice()
+    const key = getApiKey()
+    if (!voice.natural || !key) return { ok: false, error: 'VOICE_OFF' }
+    try {
+      return { ok: true, value: await speakNatural(key, text, voice.name, getModels().voice) }
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : String(e) }
+    }
+  })
   ipcMain.handle('ai:transcribe', (_e, req: TranscribeRequest) =>
     wrap(() => openrouter.transcribe(requireKey(), req, getModels().transcribe))
   )

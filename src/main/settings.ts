@@ -1,7 +1,14 @@
 import { app, safeStorage } from 'electron'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { DEFAULT_MODELS, type ModelSettings, type PublicSettings } from '@shared/api'
+import {
+  DEFAULT_MODELS,
+  DEFAULT_VOICE,
+  VOICES,
+  type ModelSettings,
+  type PublicSettings,
+  type VoiceSettings
+} from '@shared/api'
 
 interface StoredSettings {
   /** OpenRouter key, encrypted with safeStorage and base64-encoded. */
@@ -10,6 +17,7 @@ interface StoredSettings {
   /** Parent's cap on AI music tracks per day (they cost real money). */
   magicPerDay?: number
   magicUsed?: { date: string; count: number }
+  voice?: Partial<VoiceSettings>
 }
 
 export const DEFAULT_MAGIC_PER_DAY = 10
@@ -58,6 +66,7 @@ export function getPublicSettings(): PublicSettings {
     models: getModels(),
     magicPerDay: read().magicPerDay ?? DEFAULT_MAGIC_PER_DAY,
     magicLeft: magicLeft(),
+    voice: getVoice(),
     appVersion: app.getVersion()
   }
 }
@@ -96,4 +105,14 @@ export function recordMagicUse(): void {
 
 export function setMagicPerDay(n: number): void {
   write({ ...read(), magicPerDay: Math.max(0, Math.min(100, Math.round(n))) })
+}
+
+export function getVoice(): VoiceSettings {
+  return { ...DEFAULT_VOICE, ...read().voice }
+}
+
+export function setVoice(voice: Partial<VoiceSettings>): void {
+  const next = { ...getVoice(), ...voice }
+  if (!VOICES.some((v) => v.id === next.name)) next.name = DEFAULT_VOICE.name
+  write({ ...read(), voice: { natural: Boolean(next.natural), name: next.name } })
 }
