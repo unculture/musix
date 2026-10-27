@@ -9,6 +9,7 @@ interface SongCardProps {
   onRename: (title: string) => void
   onDuplicate: () => void
   onDelete: () => void
+  onShare: () => void
 }
 
 function whenText(iso: string): string {
@@ -24,7 +25,8 @@ export function SongCard({
   onOpen,
   onRename,
   onDuplicate,
-  onDelete
+  onDelete,
+  onShare
 }: SongCardProps): React.JSX.Element {
   const [editing, setEditing] = useState(false)
   const [confirming, setConfirming] = useState(false)
@@ -101,6 +103,14 @@ export function SongCard({
           </button>
           <button type="button" aria-label="Make a copy" title="Make a copy" onClick={onDuplicate}>
             👯
+          </button>
+          <button
+            type="button"
+            aria-label="Save a copy to share"
+            title="Save a copy to share"
+            onClick={onShare}
+          >
+            📦
           </button>
           <button
             type="button"

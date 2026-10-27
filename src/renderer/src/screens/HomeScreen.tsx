@@ -15,6 +15,19 @@ export function HomeScreen(): React.JSX.Element {
     refresh()
   }, [refresh])
 
+  // A .musix file double-clicked outside the app: open it straight away.
+  useEffect(() => {
+    const openImported = async (): Promise<void> => {
+      const ids = await window.musix.files.takeImported()
+      if (!ids.length) return
+      await refresh()
+      const p = await open(ids[ids.length - 1])
+      if (p) go(p.plan ? 'play' : 'words')
+    }
+    openImported()
+    return window.musix.files.onSongImported(openImported)
+  }, [refresh, open, go])
+
   return (
     <div className="home">
       <div className="home__hero">
@@ -32,7 +45,22 @@ export function HomeScreen(): React.JSX.Element {
           }}
         />
       </div>
-      <Say as="h2" text="My songs" />
+      <div className="home__songs-head">
+        <Say as="h2" text="My songs" />
+        <BigButton
+          icon="📥"
+          label="Open a song file"
+          variant="soft"
+          color="var(--sky)"
+          onClick={async () => {
+            const id = await window.musix.files.importSong()
+            if (id) {
+              await refresh()
+              toast('Song added!', '📥')
+            }
+          }}
+        />
+      </div>
       {songs.length === 0 ? (
         <div className="empty-state">
           <div className="empty-state__icon" aria-hidden>
@@ -52,6 +80,10 @@ export function HomeScreen(): React.JSX.Element {
               }}
               onRename={(title) => rename(song.id, title)}
               onDuplicate={() => duplicate(song.id)}
+              onShare={async () => {
+                const path = await window.musix.files.exportSong(song.id, song.title)
+                if (path) toast('Saved a copy of your song!', '📦')
+              }}
               onDelete={async () => {
                 await remove(song.id)
                 toast('Song moved to the bin. A grown-up can get it back.', '🗑️')

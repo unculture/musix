@@ -100,6 +100,14 @@ export interface MusixApi {
     /** Ask where to save, then write the MP3. Resolves to the saved path, or null if cancelled. */
     saveMp3(data: Uint8Array, suggestedName: string): Promise<string | null>
     showInFolder(path: string): Promise<void>
+    /** Save a song as a .musix file. Resolves to the path, or null if cancelled. */
+    exportSong(id: string, title: string): Promise<string | null>
+    /** Pick a .musix file and add it to My Songs. Resolves to the new song's id. */
+    importSong(): Promise<string | null>
+    /** Called when a .musix file is opened from outside the app (e.g. double-clicked). */
+    onSongImported(callback: () => void): () => void
+    /** Ids of songs imported from outside the app since last asked. */
+    takeImported(): Promise<string[]>
   }
   ai: {
     chat(req: ChatRequest): Promise<Result<ChatResult>>

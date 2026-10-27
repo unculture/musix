@@ -25,7 +25,15 @@ const api: MusixApi = {
   },
   files: {
     saveMp3: (data, name) => ipcRenderer.invoke('files:saveMp3', data, name),
-    showInFolder: (path) => ipcRenderer.invoke('files:showInFolder', path)
+    showInFolder: (path) => ipcRenderer.invoke('files:showInFolder', path),
+    exportSong: (id, title) => ipcRenderer.invoke('files:exportSong', id, title),
+    importSong: () => ipcRenderer.invoke('files:importSong'),
+    takeImported: () => ipcRenderer.invoke('files:takeImported'),
+    onSongImported: (callback) => {
+      const listener = (): void => callback()
+      ipcRenderer.on('song-imported', listener)
+      return () => ipcRenderer.removeListener('song-imported', listener)
+    }
   },
   ai: {
     chat: (req) => ipcRenderer.invoke('ai:chat', req),

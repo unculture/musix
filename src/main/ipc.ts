@@ -5,6 +5,7 @@ import type { ChatRequest, ModelSettings, Result, TranscribeRequest } from '@sha
 import type { Project } from '@shared/project'
 import * as openrouter from './openrouter'
 import * as projects from './projects'
+import { exportProject, importFile } from './archive'
 import {
   getApiKey,
   getModels,
@@ -31,7 +32,13 @@ function requireKey(): string {
   return key
 }
 
+const imported: string[] = []
+export const queueImported = (id: string): void => {
+  imported.push(id)
+}
+
 export function registerIpc(): void {
+  ipcMain.handle('files:takeImported', () => imported.splice(0))
   ipcMain.handle('settings:get', () => getPublicSettings())
   ipcMain.handle('settings:setKey', (_e, key: string | null) => {
     setApiKey(key)
@@ -110,4 +117,33 @@ export function registerIpc(): void {
     return filePath
   })
   ipcMain.handle('files:showInFolder', (_e, path: string) => shell.showItemInFolder(path))
+
+  ipcMain.handle('files:exportSong', async (e, id: string, title: string) => {
+    const safe = title.replace(/[\\/:*?"<>|]+/g, '').trim() || 'My song'
+    const win = BrowserWindow.fromWebContents(e.sender)
+    const options = {
+      title: 'Save a copy of your song',
+      defaultPath: join(app.getPath('documents'), `${safe}.musix`),
+      filters: [{ name: 'Musix song', extensions: ['musix'] }]
+    }
+    const { canceled, filePath } = win
+      ? await dialog.showSaveDialog(win, options)
+      : await dialog.showSaveDialog(options)
+    if (canceled || !filePath) return null
+    await exportProject(id, filePath)
+    return filePath
+  })
+  ipcMain.handle('files:importSong', async (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    const options = {
+      title: 'Open a song',
+      filters: [{ name: 'Musix song', extensions: ['musix'] }],
+      properties: ['openFile' as const]
+    }
+    const { canceled, filePaths } = win
+      ? await dialog.showOpenDialog(win, options)
+      : await dialog.showOpenDialog(options)
+    if (canceled || !filePaths[0]) return null
+    return (await importFile(filePaths[0])).id
+  })
 }
