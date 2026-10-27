@@ -29,6 +29,19 @@ export default function App(): React.JSX.Element {
   const { screen, go } = useNav()
   const project = useProject((s) => s.project)
   const close = useProject((s) => s.close)
+  const { undo, redo, past, future } = useProject()
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent): void => {
+      const typing = e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement
+      if (typing || !(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== 'z') return
+      e.preventDefault()
+      if (e.shiftKey) redo()
+      else undo()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [undo, redo])
   const font = usePrefs((s) => s.font)
   const inSong = screen !== 'home' && screen !== 'settings' && project !== null
   // Song steps need an open song; fall back to home if there isn't one.
@@ -58,6 +71,12 @@ export default function App(): React.JSX.Element {
         <div className="top-bar__spacer" />
         {inSong && <StepBar />}
         <div className="top-bar__spacer" />
+        {inSong && (
+          <>
+            <IconButton icon="↩️" label="Undo" onClick={undo} disabled={!past.length} />
+            <IconButton icon="↪️" label="Redo" onClick={redo} disabled={!future.length} />
+          </>
+        )}
         <IconButton
           icon="⚙️"
           label="Settings"

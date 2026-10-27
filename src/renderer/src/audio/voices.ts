@@ -26,16 +26,28 @@ export interface DrumVoice {
 
 const hz = (midi: number): number => Tone.Frequency(midi, 'midi').toFrequency()
 
+// Decoded samples are kept between rebuilds, so changing an instrument or a chord is instant.
+const buffers = new Map<string, Tone.ToneAudioBuffer>()
+function buffer(url: string): Tone.ToneAudioBuffer {
+  let b = buffers.get(url)
+  if (!b) {
+    b = new Tone.ToneAudioBuffer(url)
+    buffers.set(url, b)
+  }
+  return b
+}
+
 export function createPitchedVoice(id: string): PitchedVoice | null {
   const voice = VOICES[id]
   if (!voice || voice.kind === 'none') return null
   const out = new Tone.Gain(voice.gain ?? 1)
 
   if (voice.kind === 'sampled') {
-    const urls = Object.fromEntries(REGISTER_NOTES[voice.register].map((n) => [n, `${n}.mp3`]))
+    const urls = Object.fromEntries(
+      REGISTER_NOTES[voice.register].map((n) => [n, buffer(`${SAMPLE_BASE}${voice.gm}/${n}.mp3`)])
+    )
     const sampler = new Tone.Sampler({
       urls,
-      baseUrl: `${SAMPLE_BASE}${voice.gm}/`,
       release: voice.release ?? 0.5
     }).connect(out)
     return {
@@ -71,7 +83,7 @@ export function createDrumVoice(kitId: string): DrumVoice | null {
   if (!kit?.folder) return null
   const out = new Tone.Gain(kit.gain ?? 1)
   const urls = Object.fromEntries(
-    DRUM_SOUNDS.map((s) => [s, `${SAMPLE_BASE}drums/${kit.folder}/${s}.mp3`])
+    DRUM_SOUNDS.map((s) => [s, buffer(`${SAMPLE_BASE}drums/${kit.folder}/${s}.mp3`)])
   )
   const players = new Tone.Players({ urls }).connect(out)
   return {

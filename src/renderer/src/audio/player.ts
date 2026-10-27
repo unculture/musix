@@ -1,7 +1,7 @@
 import * as Tone from 'tone'
 import { create } from 'zustand'
 import type { Project } from '@shared/project'
-import { buildSong, type BuiltSong } from './build'
+import { applyMix, buildSong, type BuiltSong } from './build'
 
 // The live song player. One song is loaded at a time; changing the plan rebuilds it.
 
@@ -51,8 +51,18 @@ export const usePlayer = create<PlayerState>()((set, get) => ({
 
   load: async (project) => {
     if (!project.plan) return get().unload()
-    const key = JSON.stringify([project.id, project.plan, project.layers])
-    if (key === loadedKey && get().status !== 'error') return
+    // Volume and mute don't need a rebuild — only structural changes do.
+    const structure = {
+      ...project.plan,
+      parts: project.plan.parts.map((p) => ({ role: p.role, instrument: p.instrument }))
+    }
+    const layers = project.layers.map((l) => ({ id: l.id, file: l.file, offset: l.offset }))
+    const key = JSON.stringify([project.id, structure, layers])
+    const current = get().song
+    if (key === loadedKey && current && get().status !== 'error') {
+      applyMix(current, project.plan, project.layers)
+      return
+    }
     const token = ++loadToken
     const wasPlaying = get().playing
     const resumeAt = get().position

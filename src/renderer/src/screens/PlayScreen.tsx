@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { usePlayer } from '@/audio/player'
 import { BigButton } from '@/components/BigButton'
 import { ExportButton } from '@/components/ExportButton'
@@ -6,6 +6,7 @@ import { Karaoke } from '@/components/Karaoke'
 import { useHoverSpeak } from '@/components/Speakable'
 import { StepScreen } from '@/components/StepScreen'
 import { Timeline } from '@/components/Timeline'
+import { TrackEditor } from '@/components/TrackEditor'
 import { useNav } from '@/state/nav'
 import { useProject } from '@/state/project'
 
@@ -31,6 +32,7 @@ export function PlayScreen(): React.JSX.Element {
   const go = useNav((s) => s.go)
   const { load, song, position, bpm, seek, stop, status, pause } = usePlayer()
   const plan = project.plan
+  const [editing, setEditing] = useState(false)
 
   useEffect(() => {
     load(project)
@@ -93,6 +95,16 @@ export function PlayScreen(): React.JSX.Element {
             {Math.floor(position / 60)}:{String(Math.floor(position % 60)).padStart(2, '0')}
           </span>
         </div>
+        <div className="play__edit-toggle">
+          <BigButton
+            icon={editing ? '✅' : '🎛️'}
+            label={editing ? 'Done changing' : 'Change my song'}
+            variant={editing ? 'solid' : 'soft'}
+            color="var(--grape)"
+            onClick={() => setEditing(!editing)}
+          />
+        </div>
+        {editing && <TrackEditor />}
         {status === 'error' && (
           <p>Hmm, some instruments didn&apos;t load. Try going back and forward again.</p>
         )}

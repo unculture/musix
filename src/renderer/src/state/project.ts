@@ -3,10 +3,17 @@ import { createProject, type Project, type ProjectSummary } from '@shared/projec
 import { toast } from './toast'
 
 const AUTOSAVE_MS = 600
+/** Changes closer together than this (typing, dragging a slider) undo as one step. */
+const UNDO_GROUP_MS = 800
+const UNDO_LIMIT = 60
 
 interface ProjectState {
   project: Project | null
   songs: ProjectSummary[]
+  past: Project[]
+  future: Project[]
+  undo: () => void
+  redo: () => void
   refresh: () => Promise<void>
   create: () => Promise<Project>
   open: (id: string) => Promise<Project | null>
@@ -20,6 +27,7 @@ interface ProjectState {
 }
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null
+let lastChange = 0
 
 async function save(project: Project): Promise<void> {
   try {
@@ -30,9 +38,37 @@ async function save(project: Project): Promise<void> {
   }
 }
 
+function scheduleSave(project: Project): void {
+  if (saveTimer) clearTimeout(saveTimer)
+  saveTimer = setTimeout(() => {
+    saveTimer = null
+    save(project)
+  }, AUTOSAVE_MS)
+}
+
 export const useProject = create<ProjectState>()((set, get) => ({
   project: null,
   songs: [],
+  past: [],
+  future: [],
+
+  undo: () => {
+    const { past, project, future } = get()
+    if (!project || !past.length) return
+    const previous = past[past.length - 1]
+    set({ project: previous, past: past.slice(0, -1), future: [project, ...future] })
+    lastChange = 0
+    scheduleSave(previous)
+  },
+
+  redo: () => {
+    const { past, project, future } = get()
+    if (!project || !future.length) return
+    const next = future[0]
+    set({ project: next, past: [...past, project], future: future.slice(1) })
+    lastChange = 0
+    scheduleSave(next)
+  },
 
   refresh: async () => set({ songs: await window.musix.projects.list() }),
 
@@ -40,7 +76,7 @@ export const useProject = create<ProjectState>()((set, get) => ({
     await get().flush()
     const project = createProject()
     await save(project)
-    set({ project })
+    set({ project, past: [], future: [] })
     return project
   },
 
@@ -48,7 +84,7 @@ export const useProject = create<ProjectState>()((set, get) => ({
     await get().flush()
     try {
       const project = await window.musix.projects.load(id)
-      set({ project })
+      set({ project, past: [], future: [] })
       return project
     } catch (e) {
       console.error(e)
@@ -59,7 +95,7 @@ export const useProject = create<ProjectState>()((set, get) => ({
 
   close: async () => {
     await get().flush()
-    set({ project: null })
+    set({ project: null, past: [], future: [] })
     await get().refresh()
   },
 
@@ -67,12 +103,15 @@ export const useProject = create<ProjectState>()((set, get) => ({
     const current = get().project
     if (!current) return
     const project = { ...change(current), updatedAt: new Date().toISOString() }
-    set({ project })
-    if (saveTimer) clearTimeout(saveTimer)
-    saveTimer = setTimeout(() => {
-      saveTimer = null
-      save(project)
-    }, AUTOSAVE_MS)
+    const now = Date.now()
+    const grouped = now - lastChange < UNDO_GROUP_MS
+    lastChange = now
+    set({
+      project,
+      past: grouped ? get().past : [...get().past, current].slice(-UNDO_LIMIT),
+      future: []
+    })
+    scheduleSave(project)
   },
 
   flush: async () => {

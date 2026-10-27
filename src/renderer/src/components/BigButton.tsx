@@ -48,12 +48,14 @@ export function IconButton({
   icon,
   label,
   onClick,
-  active
+  active,
+  disabled
 }: {
   icon: string
   label: string
   onClick?: () => void
   active?: boolean
+  disabled?: boolean
 }): React.JSX.Element {
   const hover = useHoverSpeak(label)
   return (
@@ -63,6 +65,7 @@ export function IconButton({
       aria-label={label}
       title={label}
       onClick={onClick}
+      disabled={disabled}
       {...hover}
     >
       {icon}

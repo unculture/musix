@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { MOODS, type StyleChoice } from '@shared/project'
 import { MOOD_INFO, SPEEDS, STYLE_PRESETS } from '@shared/styles'
+import { previewStyle } from '@/audio/preview'
 import { MicButton } from '@/components/MicButton'
 import { Say, useHoverSpeak } from '@/components/Speakable'
 import { StepScreen } from '@/components/StepScreen'
@@ -71,7 +72,10 @@ export function StyleScreen(): React.JSX.Element {
               label={p.label}
               color={p.color}
               on={style.preset === p.id}
-              onClick={() => set({ preset: style.preset === p.id ? undefined : p.id })}
+              onClick={() => {
+                if (style.preset !== p.id) previewStyle(p.instruments)
+                set({ preset: style.preset === p.id ? undefined : p.id })
+              }}
             />
           ))}
         </div>
