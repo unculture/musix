@@ -18,7 +18,8 @@
     "test": "vitest run",
     "dist": "npm run build && electron-builder",
     "dist:mac": "npm run build && electron-builder --mac",
-    "dist:win": "npm run build && electron-builder --win"
+    "dist:win": "npm run build && electron-builder --win",
+    "dev:key": "OPENROUTER_API_KEY=$(tr -d '[:space:]' < openrouter-dev-musix-key.txt) electron-vite dev"
   },
   "repository": {
     "type": "git",

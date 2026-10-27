@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import { BigButton } from '@/components/BigButton'
+import { ParentGate } from '@/components/ParentGate'
+import { ParentPanel } from '@/components/ParentPanel'
 import { Say } from '@/components/Speakable'
 import { useNav } from '@/state/nav'
 import { usePrefs } from '@/state/prefs'
@@ -6,6 +9,7 @@ import { usePrefs } from '@/state/prefs'
 export function SettingsScreen(): React.JSX.Element {
   const go = useNav((s) => s.go)
   const { font, setFont, readOnHover, setReadOnHover } = usePrefs()
+  const [parent, setParent] = useState(false)
   return (
     <div className="settings">
       <h1>⚙️ Settings</h1>
@@ -49,6 +53,7 @@ export function SettingsScreen(): React.JSX.Element {
           </button>
         </div>
       </div>
+      {parent ? <ParentPanel /> : <ParentGate onPass={() => setParent(true)} />}
       <div>
         <BigButton icon="🏠" label="Done" color="var(--leaf)" onClick={() => go('home')} />
       </div>
