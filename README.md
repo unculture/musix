@@ -17,3 +17,15 @@ Built for an 11-year-old: simple, friendly UI, no fiddly menus.
 
 - Project board: https://github.com/users/unculture/projects/2/views/1
 - Architecture proposal: [docs/PROPOSAL.md](docs/PROPOSAL.md)
+
+## Development
+
+Requires Node 22 (`nvm use`).
+
+```sh
+npm install
+npm run dev        # run the app with hot reload
+npm test           # unit tests
+npm run lint && npm run typecheck
+npm run dist:mac   # or dist:win — build installers into dist/
+```

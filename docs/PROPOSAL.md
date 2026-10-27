@@ -27,18 +27,18 @@ An 11-year-old, dyslexic, very creative songwriter (supervised by a parent). Tha
 
 ## Technology
 
-| Area | Choice | Why |
-|---|---|---|
-| App shell | **Electron** + electron-vite + React + TypeScript | Mature, best Web Audio support, mac + Windows, easy auto-update. Installer size isn't a concern. |
-| Auto-update | **electron-updater** + GitHub Releases, built by GitHub Actions on macOS & Windows runners | Standard, free. See "Things only a human can do". |
-| AI gateway | **OpenRouter** (parent's key), all calls from the Electron main process | One key for every model; the key never reaches the UI; stored encrypted with Electron `safeStorage`. |
-| Speech-to-text | Gemini Flash (audio input) via OpenRouter | Accurate on kids' voices and song lyrics, no local model download. Can swap to local Whisper later. |
-| Hum → melody | Spotify **Basic Pitch** (`@spotify/basic-pitch`, runs locally) | Turns a hummed recording into notes; we quantise to the song's tempo and key. |
-| Song planning | Gemini Flash with **structured output** → a `SongPlan` JSON | The AI "composer": tempo, key, sections, chords, instruments, drum style and a melody fitted to the lyrics. |
-| Editable track | **Tone.js** rendering the `SongPlan` (drums, bass, chords, guide melody) with sampled instruments | Every part is data, so it's fully editable and re-renderable. |
-| AI audio track | **Google Lyria 3** via OpenRouter (audio output) | Studio-quality backing track generated from the same plan (style, tempo, key, structure, lyrics). |
-| Export | Offline render (Tone.Offline) → WAV → MP3 (lamejs) | No external binaries. |
-| Projects | `.musix` file (zip: `project.json` + audio recordings), autosaved to `Documents/Musix` | Save, re-open, export/import, back up. |
+| Area           | Choice                                                                                            | Why                                                                                                         |
+| -------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| App shell      | **Electron** + electron-vite + React + TypeScript                                                 | Mature, best Web Audio support, mac + Windows, easy auto-update. Installer size isn't a concern.            |
+| Auto-update    | **electron-updater** + GitHub Releases, built by GitHub Actions on macOS & Windows runners        | Standard, free. See "Things only a human can do".                                                           |
+| AI gateway     | **OpenRouter** (parent's key), all calls from the Electron main process                           | One key for every model; the key never reaches the UI; stored encrypted with Electron `safeStorage`.        |
+| Speech-to-text | Gemini Flash (audio input) via OpenRouter                                                         | Accurate on kids' voices and song lyrics, no local model download. Can swap to local Whisper later.         |
+| Hum → melody   | Spotify **Basic Pitch** (`@spotify/basic-pitch`, runs locally)                                    | Turns a hummed recording into notes; we quantise to the song's tempo and key.                               |
+| Song planning  | Gemini Flash with **structured output** → a `SongPlan` JSON                                       | The AI "composer": tempo, key, sections, chords, instruments, drum style and a melody fitted to the lyrics. |
+| Editable track | **Tone.js** rendering the `SongPlan` (drums, bass, chords, guide melody) with sampled instruments | Every part is data, so it's fully editable and re-renderable.                                               |
+| AI audio track | **Google Lyria 3** via OpenRouter (audio output)                                                  | Studio-quality backing track generated from the same plan (style, tempo, key, structure, lyrics).           |
+| Export         | Offline render (Tone.Offline) → WAV → MP3 (lamejs)                                                | No external binaries.                                                                                       |
+| Projects       | `.musix` file (zip: `project.json` + audio recordings), autosaved to `Documents/Musix`            | Save, re-open, export/import, back up.                                                                      |
 
 ### "A mixture of both" — the two kinds of track
 
@@ -64,6 +64,7 @@ Section { id, kind: 'intro'|'verse'|'chorus'|'bridge'|'outro', bars, chords: Cho
 ## Delivery plan (tickets on the project board)
 
 **P0 — the core loop (words → song → MP3)**
+
 1. Scaffold: Electron + Vite + React + TS, lint, tests, CI build
 2. Kid-friendly design system & app shell (fonts, colours, read-aloud, step navigation)
 3. Parent settings & OpenRouter client (encrypted key)
@@ -74,19 +75,9 @@ Section { id, kind: 'intro'|'verse'|'chorus'|'bridge'|'outro', bars, chords: Cho
 8. Audio engine: play the `SongPlan` with karaoke lyrics
 9. Export MP3
 
-**P1 — creativity & polish**
-10. Hum a tune → melody
-11. Track editor (sections, instruments, tempo, mixer, undo)
-12. Magic mode: Lyria AI backing track + layering
-13. Record vocals over the track
-14. Packaging, releases & auto-update
-15. Save/open/import `.musix` project files
+**P1 — creativity & polish** 10. Hum a tune → melody 11. Track editor (sections, instruments, tempo, mixer, undo) 12. Magic mode: Lyria AI backing track + layering 13. Record vocals over the track 14. Packaging, releases & auto-update 15. Save/open/import `.musix` project files
 
-**P2 — later**
-16. Melody editor (simple piano roll)
-17. Lyric helper (rhymes, "what comes next?") & cover art
-18. Guided first-run tour with voice
-19. Accounts & cloud sync
+**P2 — later** 16. Melody editor (simple piano roll) 17. Lyric helper (rhymes, "what comes next?") & cover art 18. Guided first-run tour with voice 19. Accounts & cloud sync
 
 ## Things only a human can do
 

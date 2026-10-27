@@ -1,0 +1,31 @@
+appId: com.unculture.musix
+productName: Musix
+directories:
+  buildResources: build
+  output: dist
+files:
+  - out/**
+  - package.json
+asarUnpack:
+  - resources/**
+extraResources:
+  - from: resources
+    to: resources
+    filter: ['**/*']
+mac:
+  category: public.app-category.music
+  target:
+    - target: dmg
+      arch: [universal]
+    - target: zip
+      arch: [universal]
+  extendInfo:
+    NSMicrophoneUsageDescription: Musix uses the microphone so you can sing, hum and speak your lyrics.
+win:
+  target:
+    - target: nsis
+      arch: [x64, arm64]
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  artifactName: Musix-Setup-${version}.${ext}
