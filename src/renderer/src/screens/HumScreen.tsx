@@ -53,8 +53,8 @@ export function HumScreen(): React.JSX.Element {
     // Get the tune detector ready during the count-in. Doing it when the screen opens froze
     // the buttons for a few seconds on slower laptops.
     warmUp()
-    speak('Get ready… hum after four clicks.')
-    await new Promise((r) => setTimeout(r, 1800))
+    // Finish talking before the mic opens.
+    await speak('Get ready… hum after four clicks.')
     await countIn(bpm)
     if (!(await start())) {
       toast('I need to use the microphone. Ask a grown-up to allow it.', '🎙️')

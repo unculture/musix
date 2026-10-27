@@ -99,8 +99,8 @@ export function VocalRecorder(): React.JSX.Element {
   }, [playing])
 
   const record = async (): Promise<void> => {
-    speak('Put your headphones on, then sing along!')
-    await new Promise((r) => setTimeout(r, 2200))
+    // Finish talking before the mic opens.
+    await speak('Put your headphones on, then sing along!')
     const s = await startVocalSession()
     if (!s) {
       toast('I need to use the microphone. Ask a grown-up to allow it.', '🎙️')
