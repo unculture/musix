@@ -57,7 +57,8 @@ export function getPublicSettings(): PublicSettings {
     keySource: stored ? 'stored' : env ? 'env' : 'none',
     models: getModels(),
     magicPerDay: read().magicPerDay ?? DEFAULT_MAGIC_PER_DAY,
-    magicLeft: magicLeft()
+    magicLeft: magicLeft(),
+    appVersion: app.getVersion()
   }
 }
 

@@ -4,6 +4,14 @@ import type { MusixApi } from '@shared/api'
 const api: MusixApi = {
   platform: process.platform,
   versions: { app: process.env['npm_package_version'] ?? '', electron: process.versions.electron },
+  updates: {
+    onReady: (callback) => {
+      const listener = (_e: Electron.IpcRendererEvent, version: string): void => callback(version)
+      ipcRenderer.on('update-ready', listener)
+      return () => ipcRenderer.removeListener('update-ready', listener)
+    },
+    restartNow: () => ipcRenderer.invoke('app:restartToUpdate')
+  },
   settings: {
     get: () => ipcRenderer.invoke('settings:get'),
     setKey: (key) => ipcRenderer.invoke('settings:setKey', key),

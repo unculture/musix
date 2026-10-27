@@ -17,6 +17,7 @@ Built for an 11-year-old: simple, friendly UI, no fiddly menus.
 
 - Project board: https://github.com/users/unculture/projects/2/views/1
 - Architecture proposal: [docs/PROPOSAL.md](docs/PROPOSAL.md)
+- Releasing & auto-update: [docs/RELEASING.md](docs/RELEASING.md)
 
 ## Development
 
@@ -28,4 +29,7 @@ npm run dev        # run the app with hot reload
 npm test           # unit tests
 npm run lint && npm run typecheck
 npm run dist:mac   # or dist:win — build installers into dist/
+npm run dev:key    # dev with the local OpenRouter key file (openrouter-dev-musix-key.txt, gitignored)
 ```
+
+The OpenRouter key for real use is entered in the app: Settings → Grown-ups (press and hold).

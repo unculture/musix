@@ -94,6 +94,13 @@ export function ParentPanel(): React.JSX.Element {
         />
         <span>({settings.magicLeft} left today · about $0.08 each)</span>
       </label>
+      <div className="parent-panel__row parent-panel__note">
+        Musix {settings.appVersion} · updates download automatically and install when the app is
+        closed.
+        <button type="button" className="choice" onClick={() => window.musix.updates.restartNow()}>
+          Restart to update
+        </button>
+      </div>
       <details>
         <summary>Advanced: AI models</summary>
         {(Object.keys(models) as (keyof ModelSettings)[]).map((name) => (
