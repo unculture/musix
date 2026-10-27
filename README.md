@@ -16,3 +16,4 @@ Built for an 11-year-old: simple, friendly UI, no fiddly menus.
 ## Links
 
 - Project board: https://github.com/users/unculture/projects/2/views/1
+- Architecture proposal: [docs/PROPOSAL.md](docs/PROPOSAL.md)
