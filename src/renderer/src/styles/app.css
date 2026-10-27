@@ -863,3 +863,60 @@
   display: flex;
   gap: 12px;
 }
+
+/* ---------- Hum ---------- */
+.hum {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 28px;
+  min-height: 340px;
+}
+.hum__meter {
+  --level: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 140px;
+}
+.hum__meter span {
+  width: 16px;
+  border-radius: 8px;
+  background: var(--sky);
+  height: calc(16px + var(--level) * 120px);
+  animation: wiggle 0.6s ease-in-out infinite alternate;
+  transition: height 0.08s linear;
+}
+@keyframes wiggle {
+  from {
+    transform: scaleY(0.6);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+.hum__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+.note-blobs {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.note-blobs__note {
+  position: absolute;
+  height: 18%;
+  border-radius: 999px;
+  margin-left: 2%;
+  transform: translateY(-10%);
+  opacity: 0.9;
+}
+.note-blobs__note--on {
+  outline: 4px solid var(--ink);
+}

@@ -4,6 +4,7 @@ import { pathToFileURL } from 'node:url'
 import { songsDir } from './projects'
 
 // musix://samples/<path>      → bundled instrument samples
+// musix://models/<path>       → bundled ML models (Basic Pitch)
 // musix://song/<id>/<file>    → a song's recorded / generated audio
 // A custom scheme lets the renderer fetch() local audio the same way in dev and when packaged.
 
@@ -22,10 +23,12 @@ export function registerSchemes(): void {
   ])
 }
 
-export const samplesDir = (): string =>
+const resourceDir = (name: string): string =>
   app.isPackaged
-    ? join(process.resourcesPath, 'resources', 'samples')
-    : join(app.getAppPath(), 'resources', 'samples')
+    ? join(process.resourcesPath, 'resources', name)
+    : join(app.getAppPath(), 'resources', name)
+
+export const samplesDir = (): string => resourceDir('samples')
 
 function inside(root: string, rel: string): string | null {
   const full = normalize(join(root, rel))
@@ -38,6 +41,7 @@ export function handleProtocol(): void {
     const rel = decodeURIComponent(url.pathname).replace(/^\/+/, '')
     let file: string | null = null
     if (url.host === 'samples') file = inside(samplesDir(), rel)
+    else if (url.host === 'models') file = inside(resourceDir('models'), rel)
     else if (url.host === 'song') {
       const [id, ...rest] = rel.split('/')
       if (/^[a-z0-9]+$/i.test(id)) file = inside(join(songsDir(), id, 'audio'), rest.join('/'))
@@ -47,7 +51,9 @@ export function handleProtocol(): void {
     return new Response(res.body, {
       status: res.status,
       headers: {
-        'Content-Type': res.headers.get('Content-Type') ?? 'audio/mpeg',
+        'Content-Type': file.endsWith('.json')
+          ? 'application/json'
+          : (res.headers.get('Content-Type') ?? 'application/octet-stream'),
         'Access-Control-Allow-Origin': '*'
       }
     })
