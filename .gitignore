@@ -2,7 +2,10 @@
 Thumbs.db
 node_modules/
 dist/
-build/
+# build/ holds electron-builder resources; only the icon is a source file.
+/build/*
+!/build/icon.png
+!/build/icon.svg
 out/
 target/
 .env
