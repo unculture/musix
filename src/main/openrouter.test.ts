@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { buildChatBody, buildTranscribeRequest, parseJsonReply } from './openrouter'
+import {
+  buildChatBody,
+  buildSpeechBody,
+  buildTranscribeRequest,
+  parseJsonReply,
+  pcmToWav,
+  saidExactly
+} from './openrouter'
 
 describe('buildChatBody', () => {
   it('uses the default model and adds a strict json_schema response format', () => {
@@ -39,5 +46,29 @@ describe('parseJsonReply', () => {
     expect(parseJsonReply('{"a":1}')).toEqual({ a: 1 })
     expect(parseJsonReply('```json\n{"a":2}\n```')).toEqual({ a: 2 })
     expect(parseJsonReply('Here you go: {"a":3} enjoy')).toEqual({ a: 3 })
+  })
+})
+
+describe('speech', () => {
+  it('asks for the words only, in the chosen voice', () => {
+    const body = buildSpeechBody('Bin this song?', 'marin', 'openai/gpt-audio-mini')
+    expect(body.audio).toEqual({ voice: 'marin', format: 'pcm16' })
+    expect(JSON.stringify(body.messages)).toContain('«Bin this song?»')
+  })
+
+  it('accepts a faithful reading and rejects an ad-lib', () => {
+    expect(
+      saidExactly('"Get ready... hum after four clicks."', 'Get ready… hum after four clicks.')
+    ).toBe(true)
+    expect(saidExactly('Let’s go!', "Let's go!")).toBe(true)
+    expect(saidExactly('Sure! Bin this song?', 'Bin this song?')).toBe(false)
+  })
+
+  it('wraps PCM in a playable WAV header', () => {
+    const wav = pcmToWav(Buffer.alloc(48000))
+    expect(wav.subarray(0, 4).toString()).toBe('RIFF')
+    expect(wav.readUInt32LE(24)).toBe(24000)
+    expect(wav.readUInt32LE(40)).toBe(48000)
+    expect(wav.length).toBe(48044)
   })
 })

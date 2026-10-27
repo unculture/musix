@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import type { KeyStatus, ModelSettings, PublicSettings } from '@shared/api'
+import { VOICES, type KeyStatus, type ModelSettings, type PublicSettings } from '@shared/api'
+import { forgetVoiceClips, speak, stopSpeaking } from '@/lib/speech'
 
 // Plain, grown-up language here — this is for the parent, not the child.
 export function ParentPanel(): React.JSX.Element {
@@ -94,6 +95,44 @@ export function ParentPanel(): React.JSX.Element {
         />
         <span>({settings.magicLeft} left today · about $0.08 each)</span>
       </label>
+      <div className="parent-panel__row">
+        <strong>Reading-aloud voice:</strong>
+        <button
+          type="button"
+          className={`choice${settings.voice.natural ? ' choice--on' : ''}`}
+          aria-pressed={settings.voice.natural}
+          onClick={async () => {
+            setSettings(await window.musix.settings.setVoice({ natural: !settings.voice.natural }))
+            forgetVoiceClips()
+          }}
+        >
+          {settings.voice.natural ? '✅ Natural AI voice' : 'Computer voice'}
+        </button>
+        <span className="parent-panel__note">
+          Each phrase costs about $0.0002 the first time, then plays free from this computer.
+          Without internet it uses the computer voice.
+        </span>
+      </div>
+      {settings.voice.natural && (
+        <div className="parent-panel__row">
+          {VOICES.map((v) => (
+            <button
+              key={v.id}
+              type="button"
+              className={`choice${settings.voice.name === v.id ? ' choice--on' : ''}`}
+              aria-pressed={settings.voice.name === v.id}
+              onClick={async () => {
+                stopSpeaking()
+                setSettings(await window.musix.settings.setVoice({ name: v.id }))
+                forgetVoiceClips()
+                speak(`Hi! I'm Mo. Let's make a song together.`)
+              }}
+            >
+              🔊 {v.label}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="parent-panel__row parent-panel__note">
         Musix {settings.appVersion} · updates download automatically and install when the app is
         closed.

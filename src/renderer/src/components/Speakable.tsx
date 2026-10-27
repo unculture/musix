@@ -1,5 +1,5 @@
 import { useRef, type ReactNode } from 'react'
-import { speak } from '@/lib/speech'
+import { prepareSpeech, speak } from '@/lib/speech'
 import { usePrefs } from '@/state/prefs'
 
 const HOVER_DELAY_MS = 900
@@ -32,6 +32,7 @@ export function useHoverSpeak(text: string): SpeakHandlers {
     // used to read the label out a moment after every tap — even after starting a recording.
     onPointerEnter: (e) => {
       if (!readOnHover || e.pointerType !== 'mouse') return
+      prepareSpeech(text)
       hoverTimer.current = setTimeout(() => speak(text), HOVER_DELAY_MS)
     },
     onPointerLeave: () => {
@@ -41,6 +42,7 @@ export function useHoverSpeak(text: string): SpeakHandlers {
       held.current = false
       if (hoverTimer.current) clearTimeout(hoverTimer.current)
       if (e.pointerType === 'mouse') return
+      prepareSpeech(text)
       clearHold()
       holdTimer.current = setTimeout(() => {
         held.current = true

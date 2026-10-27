@@ -17,7 +17,8 @@ const api: MusixApi = {
     setKey: (key) => ipcRenderer.invoke('settings:setKey', key),
     testKey: (key) => ipcRenderer.invoke('settings:testKey', key),
     setModels: (models) => ipcRenderer.invoke('settings:setModels', models),
-    setMagicPerDay: (n) => ipcRenderer.invoke('settings:setMagicPerDay', n)
+    setMagicPerDay: (n) => ipcRenderer.invoke('settings:setMagicPerDay', n),
+    setVoice: (voice) => ipcRenderer.invoke('settings:setVoice', voice)
   },
   media: {
     askMic: () => ipcRenderer.invoke('media:askMic')
@@ -47,7 +48,8 @@ const api: MusixApi = {
     chat: (req) => ipcRenderer.invoke('ai:chat', req),
     transcribe: (req) => ipcRenderer.invoke('ai:transcribe', req),
     music: (projectId, prompt) => ipcRenderer.invoke('ai:music', projectId, prompt),
-    cover: (projectId, prompt) => ipcRenderer.invoke('ai:cover', projectId, prompt)
+    cover: (projectId, prompt) => ipcRenderer.invoke('ai:cover', projectId, prompt),
+    speak: (text) => ipcRenderer.invoke('ai:speak', text)
   }
 }
 

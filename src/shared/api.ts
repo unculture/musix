@@ -10,14 +10,34 @@ export interface ModelSettings {
   music: string
   /** Cover pictures (image output). */
   image: string
+  /** Natural read-aloud voice (audio output). */
+  voice: string
 }
 
 export const DEFAULT_MODELS: ModelSettings = {
   text: 'google/gemini-3.5-flash',
   transcribe: 'google/gemini-3.5-flash',
   music: 'google/lyria-3-pro-preview',
-  image: 'google/gemini-3.1-flash-image'
+  image: 'google/gemini-3.1-flash-image',
+  voice: 'openai/gpt-audio-mini'
 }
+
+/** Voices the parent can choose for read-aloud. */
+export const VOICES = [
+  { id: 'marin', label: 'Marin' },
+  { id: 'coral', label: 'Coral' },
+  { id: 'shimmer', label: 'Shimmer' },
+  { id: 'sage', label: 'Sage' },
+  { id: 'cedar', label: 'Cedar' }
+] as const
+
+export interface VoiceSettings {
+  /** Use the natural AI voice (falls back to the computer's voice when offline). */
+  natural: boolean
+  name: string
+}
+
+export const DEFAULT_VOICE: VoiceSettings = { natural: true, name: 'marin' }
 
 export interface PublicSettings {
   hasKey: boolean
@@ -27,6 +47,7 @@ export interface PublicSettings {
   /** Daily cap on AI music tracks, set by the parent. */
   magicPerDay: number
   magicLeft: number
+  voice: VoiceSettings
   appVersion: string
 }
 
@@ -91,6 +112,7 @@ export interface MusixApi {
     testKey(key?: string): Promise<KeyStatus>
     setModels(models: Partial<ModelSettings>): Promise<PublicSettings>
     setMagicPerDay(n: number): Promise<PublicSettings>
+    setVoice(voice: Partial<VoiceSettings>): Promise<PublicSettings>
   }
   media: {
     /** Ask the OS for microphone access (macOS shows a prompt the first time). */
@@ -125,5 +147,7 @@ export interface MusixApi {
     music(projectId: string, prompt: string): Promise<Result<string>>
     /** Draw a cover picture and save it with the song. Counts towards the daily magic limit. */
     cover(projectId: string, prompt: string): Promise<Result<string>>
+    /** Read a line aloud with the natural voice: WAV bytes (cached on disk after the first time). */
+    speak(text: string): Promise<Result<Uint8Array>>
   }
 }
