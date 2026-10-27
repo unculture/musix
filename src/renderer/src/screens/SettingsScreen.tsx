@@ -8,7 +8,7 @@ import { usePrefs } from '@/state/prefs'
 
 export function SettingsScreen(): React.JSX.Element {
   const go = useNav((s) => s.go)
-  const { font, setFont, readOnHover, setReadOnHover } = usePrefs()
+  const { font, setFont, readOnHover, setReadOnHover, restartTour } = usePrefs()
   const [parent, setParent] = useState(false)
   return (
     <div className="settings">
@@ -52,6 +52,12 @@ export function SettingsScreen(): React.JSX.Element {
             🤫 No
           </button>
         </div>
+      </div>
+      <div className="card setting-row">
+        <Say text="Meet Mo again" />
+        <button type="button" className="choice" onClick={restartTour}>
+          👾 Show me around
+        </button>
       </div>
       {parent ? <ParentPanel /> : <ParentGate onPass={() => setParent(true)} />}
       <div>

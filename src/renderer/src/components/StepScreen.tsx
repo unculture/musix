@@ -1,5 +1,6 @@
-import type { CSSProperties, ReactNode } from 'react'
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { STEPS, useNav, type StepId } from '@/state/nav'
+import { usePrefs } from '@/state/prefs'
 import { BigButton } from './BigButton'
 import { Mascot } from './Mascot'
 
@@ -23,6 +24,11 @@ export function StepScreen({
   footer
 }: StepScreenProps): React.JSX.Element {
   const go = useNav((s) => s.go)
+  // The first time she reaches each step, Mo reads the tip out loud.
+  const [firstVisit] = useState(() => !usePrefs.getState().heard.includes(step))
+  useEffect(() => {
+    if (firstVisit) usePrefs.getState().markHeard(step)
+  }, [firstVisit, step])
   const index = STEPS.findIndex((s) => s.id === step)
   const info = STEPS[index]
   const prev = STEPS[index - 1]
@@ -37,7 +43,7 @@ export function StepScreen({
         <h1>
           <span aria-hidden>{info.icon}</span> {title}
         </h1>
-        <Mascot message={help} />
+        <Mascot message={help} autoSpeak={firstVisit} />
       </header>
       <div className="step-screen__body">{children}</div>
       <footer className="step-screen__footer">

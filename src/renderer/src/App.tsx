@@ -4,6 +4,7 @@ import './styles/app.css'
 import { IconButton } from './components/BigButton'
 import { StepBar } from './components/StepBar'
 import { Toasts } from './components/Toasts'
+import { Tour } from './components/Tour'
 import { HomeScreen } from './screens/HomeScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
 import { HumScreen } from './screens/HumScreen'
@@ -96,6 +97,7 @@ export default function App(): React.JSX.Element {
       <main className="main">
         <Current />
       </main>
+      <Tour />
       <Toasts />
     </div>
   )
