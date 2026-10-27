@@ -1,5 +1,7 @@
 # Musix
 
+**Website & downloads:** https://unculture.github.io/musix/
+
 A fun, kid-friendly desktop app (macOS + Windows) for turning lyrics into songs.
 
 ## The idea
