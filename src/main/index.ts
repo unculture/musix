@@ -1,5 +1,6 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'node:path'
+import { writeFileSync } from 'node:fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
 function createWindow(): void {
@@ -20,6 +21,19 @@ function createWindow(): void {
   })
 
   win.on('ready-to-show', () => win.show())
+
+  // Dev aid: MUSIX_SCREENSHOT=out.png captures the window after load, then quits.
+  const shot = process.env['MUSIX_SCREENSHOT']
+  if (shot) {
+    win.webContents.on('did-finish-load', async () => {
+      if (process.env['MUSIX_SCREENSHOT_JS']) {
+        await win.webContents.executeJavaScript(process.env['MUSIX_SCREENSHOT_JS'])
+      }
+      await new Promise((r) => setTimeout(r, 1500))
+      writeFileSync(shot, (await win.webContents.capturePage()).toPNG())
+      app.quit()
+    })
+  }
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
     return { action: 'deny' }

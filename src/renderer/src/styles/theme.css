@@ -1,0 +1,131 @@
+@import '@fontsource/lexend/400.css';
+@import '@fontsource/lexend/500.css';
+@import '@fontsource/lexend/700.css';
+@import '@fontsource/opendyslexic/400.css';
+@import '@fontsource/opendyslexic/700.css';
+
+/*
+ * Musix design tokens.
+ * Built for a dyslexic 11-year-old: warm cream background (less glare than white),
+ * dark-but-not-black text, generous spacing, no italics, no all-caps, big targets.
+ */
+:root {
+  --font-body: 'Lexend', system-ui, sans-serif;
+
+  --bg: #fff8ec;
+  --surface: #ffffff;
+  --surface-2: #fdf0d9;
+  --ink: #2b2340;
+  --ink-soft: #5d5470;
+  --line: #eadcc2;
+
+  /* Each step / section kind gets its own colour so it can be recognised without reading. */
+  --berry: #e8457a;
+  --berry-soft: #fde2ec;
+  --sun: #ffb627;
+  --sun-soft: #fff0cc;
+  --sky: #3a9bdc;
+  --sky-soft: #ddeffb;
+  --leaf: #2fb67c;
+  --leaf-soft: #d9f4e8;
+  --grape: #8b5cf6;
+  --grape-soft: #ece4fe;
+  --coral: #ff7a59;
+  --coral-soft: #ffe5dc;
+
+  --radius: 24px;
+  --radius-sm: 14px;
+  --shadow: 0 4px 0 rgba(43, 35, 64, 0.12), 0 10px 24px rgba(43, 35, 64, 0.08);
+  --shadow-press: 0 1px 0 rgba(43, 35, 64, 0.12);
+
+  --text-sm: 18px;
+  --text: 22px;
+  --text-lg: 28px;
+  --text-xl: 40px;
+  --line-height: 1.6;
+  --letter-spacing: 0.02em;
+  --word-spacing: 0.12em;
+}
+
+:root[data-font='dyslexic'] {
+  --font-body: 'OpenDyslexic', 'Lexend', system-ui, sans-serif;
+  --text-sm: 17px;
+  --text: 20px;
+  --text-lg: 26px;
+  --text-xl: 36px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text);
+  line-height: var(--line-height);
+  letter-spacing: var(--letter-spacing);
+  word-spacing: var(--word-spacing);
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0;
+  text-transform: none;
+}
+h1 {
+  font-size: var(--text-xl);
+}
+h2 {
+  font-size: var(--text-lg);
+}
+
+em,
+i {
+  font-style: normal;
+  font-weight: 700;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+}
+
+textarea,
+input[type='text'],
+input[type='password'] {
+  user-select: text;
+}
+
+:focus-visible {
+  outline: 4px solid var(--sky);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
