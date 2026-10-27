@@ -3,21 +3,56 @@ import { speak } from '@/lib/speech'
 import { usePrefs } from '@/state/prefs'
 
 const HOVER_DELAY_MS = 900
+const HOLD_MS = 550
 
-// Speaks `text` when hovered for a moment (if read-on-hover is switched on).
-export function useHoverSpeak(text: string): {
+interface SpeakHandlers {
   onMouseEnter: () => void
   onMouseLeave: () => void
-} {
+  onPointerDown: (e: React.PointerEvent) => void
+  onPointerUp: () => void
+  onPointerCancel: () => void
+  onClickCapture: (e: React.MouseEvent) => void
+}
+
+/**
+ * Read `text` aloud when it's pointed at with a mouse for a moment (if read-on-hover is on),
+ * or pressed and held with a finger. A press-and-hold only speaks — it doesn't also tap the button.
+ */
+export function useHoverSpeak(text: string): SpeakHandlers {
   const readOnHover = usePrefs((s) => s.readOnHover)
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const held = useRef(false)
+  const clearHold = (): void => {
+    if (holdTimer.current) clearTimeout(holdTimer.current)
+    holdTimer.current = null
+  }
   return {
     onMouseEnter: () => {
       if (!readOnHover) return
-      timer.current = setTimeout(() => speak(text), HOVER_DELAY_MS)
+      hoverTimer.current = setTimeout(() => speak(text), HOVER_DELAY_MS)
     },
     onMouseLeave: () => {
-      if (timer.current) clearTimeout(timer.current)
+      if (hoverTimer.current) clearTimeout(hoverTimer.current)
+    },
+    onPointerDown: (e) => {
+      held.current = false
+      if (e.pointerType === 'mouse') return
+      clearHold()
+      holdTimer.current = setTimeout(() => {
+        held.current = true
+        speak(text)
+      }, HOLD_MS)
+    },
+    onPointerUp: clearHold,
+    onPointerCancel: clearHold,
+    onClickCapture: (e) => {
+      clearHold()
+      if (held.current) {
+        held.current = false
+        e.preventDefault()
+        e.stopPropagation()
+      }
     }
   }
 }

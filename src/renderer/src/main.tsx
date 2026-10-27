@@ -14,6 +14,12 @@ Object.assign(window, {
   __musixDebug: { Tone, tf, buildSong, usePlayer, useProject, detectNotes, humToMelody }
 })
 
+// Long-press on a touch screen would open a context menu — only allow it in text boxes.
+window.addEventListener('contextmenu', (e) => {
+  if (!(e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement))
+    e.preventDefault()
+})
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

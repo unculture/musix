@@ -377,6 +377,8 @@
 
 /* ---------- Parent area ---------- */
 .parent-gate__hold {
+  touch-action: none;
+  min-height: 56px;
   justify-self: start;
   border: 3px solid var(--line);
   border-radius: var(--radius-sm);
@@ -988,8 +990,6 @@
 .mixer input[type='range'],
 .speed input[type='range'] {
   width: 100%;
-  height: 28px;
-  accent-color: var(--row, var(--grape));
   cursor: pointer;
 }
 .sounds__row {
