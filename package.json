@@ -1,6 +1,6 @@
 {
   "name": "musix",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A fun song-making app for kids",
   "main": "./out/main/index.js",
   "scripts": {
