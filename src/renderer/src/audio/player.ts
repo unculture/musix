@@ -16,7 +16,8 @@ interface PlayerState {
   bpm: number
   song: BuiltSong | null
   load: (project: Project) => Promise<void>
-  play: () => Promise<void>
+  /** Start playing; `at` is an optional audio-context time to start exactly then. */
+  play: (at?: number) => Promise<void>
   pause: () => void
   stop: () => void
   seek: (seconds: number) => void
@@ -91,11 +92,11 @@ export const usePlayer = create<PlayerState>()((set, get) => ({
     }
   },
 
-  play: async () => {
+  play: async (at) => {
     if (get().status !== 'ready') return
     await Tone.start()
     if (transport().seconds >= get().duration - 0.05) transport().seconds = 0
-    transport().start()
+    transport().start(at)
     set({ playing: true })
     cancelAnimationFrame(raf)
     raf = requestAnimationFrame(tick)

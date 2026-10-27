@@ -7,6 +7,12 @@ import { handleProtocol, registerSchemes } from './protocol'
 
 registerSchemes()
 
+// Dev aid: MUSIX_FAKE_MIC=1 uses Chromium's test microphone (a beeping tone) for automated checks.
+if (process.env['MUSIX_FAKE_MIC']) {
+  app.commandLine.appendSwitch('use-fake-device-for-media-stream')
+  app.commandLine.appendSwitch('use-fake-ui-for-media-stream')
+}
+
 function createWindow(): void {
   const win = new BrowserWindow({
     width: 1280,

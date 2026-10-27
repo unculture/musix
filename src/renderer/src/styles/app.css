@@ -1101,3 +1101,65 @@
   justify-content: center;
   gap: 14px;
 }
+
+/* ---------- Vocals ---------- */
+.vocals {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+.vocals__tip {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+.vocals__live {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.vocals__dot {
+  --level: 0;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--berry-soft);
+  font-size: 36px;
+  box-shadow: 0 0 0 calc(4px + var(--level) * 36px) rgba(232, 69, 122, 0.25);
+}
+.vocals__rec {
+  font-weight: 700;
+  font-size: var(--text-lg);
+  color: var(--berry);
+}
+.vocals__takes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.take {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 3px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 6px 4px 6px;
+  font-weight: 700;
+  font-size: var(--text-sm);
+}
+.take--on {
+  border-color: var(--berry);
+  background: var(--berry-soft);
+}
+.take button {
+  border: 0;
+  background: var(--surface);
+  border-radius: 50%;
+  width: 46px;
+  height: 46px;
+  font-size: 22px;
+  cursor: pointer;
+}

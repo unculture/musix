@@ -4,6 +4,7 @@ import { BigButton } from '@/components/BigButton'
 import { ExportButton } from '@/components/ExportButton'
 import { Karaoke } from '@/components/Karaoke'
 import { MagicBand } from '@/components/MagicBand'
+import { VocalRecorder } from '@/components/VocalRecorder'
 import { useHoverSpeak } from '@/components/Speakable'
 import { StepScreen } from '@/components/StepScreen'
 import { Timeline } from '@/components/Timeline'
@@ -96,6 +97,7 @@ export function PlayScreen(): React.JSX.Element {
             {Math.floor(position / 60)}:{String(Math.floor(position % 60)).padStart(2, '0')}
           </span>
         </div>
+        <VocalRecorder />
         <MagicBand />
         <div className="play__edit-toggle">
           <BigButton

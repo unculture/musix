@@ -146,6 +146,41 @@ export function TrackEditor(): React.JSX.Element {
               </div>
             )
           })}
+          {project.layers
+            .filter((l) => !l.muted)
+            .map((layer) => {
+              const label = layer.kind === 'vocal' ? 'My voice' : layer.name
+              const setLayer = (change: Partial<typeof layer>): void =>
+                update((p) => ({
+                  ...p,
+                  layers: p.layers.map((l) => (l.id === layer.id ? { ...l, ...change } : l))
+                }))
+              return (
+                <div
+                  key={layer.id}
+                  className="mixer__row"
+                  style={
+                    {
+                      '--row': layer.kind === 'vocal' ? 'var(--berry)' : 'var(--grape)'
+                    } as CSSProperties
+                  }
+                >
+                  <span className="mixer__name">
+                    <span aria-hidden>{layer.kind === 'vocal' ? '🎤' : '🪄'}</span> {label}
+                  </span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={layer.volume}
+                    aria-label={`${label} volume`}
+                    onChange={(e) => setLayer({ volume: Number(e.target.value) })}
+                  />
+                  <span />
+                </div>
+              )
+            })}
         </div>
       )}
 
