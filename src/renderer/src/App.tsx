@@ -9,6 +9,7 @@ import { SettingsScreen } from './screens/SettingsScreen'
 import { HumScreen, MakeScreen, PlayScreen, StyleScreen, WordsScreen } from './screens/placeholders'
 import { useNav, type Screen } from './state/nav'
 import { usePrefs } from './state/prefs'
+import { useProject } from './state/project'
 
 const SCREENS: Record<Screen, () => React.JSX.Element> = {
   home: HomeScreen,
@@ -22,9 +23,12 @@ const SCREENS: Record<Screen, () => React.JSX.Element> = {
 
 export default function App(): React.JSX.Element {
   const { screen, go } = useNav()
+  const project = useProject((s) => s.project)
+  const close = useProject((s) => s.close)
   const font = usePrefs((s) => s.font)
-  const inSong = screen !== 'home' && screen !== 'settings'
-  const Current = SCREENS[screen]
+  const inSong = screen !== 'home' && screen !== 'settings' && project !== null
+  // Song steps need an open song; fall back to home if there isn't one.
+  const Current = SCREENS[screen !== 'home' && screen !== 'settings' && !project ? 'home' : screen]
 
   useEffect(() => {
     document.documentElement.dataset.font = font
@@ -33,7 +37,15 @@ export default function App(): React.JSX.Element {
   return (
     <div className="app">
       <header className="top-bar">
-        <button type="button" className="logo" onClick={() => go('home')} aria-label="Home">
+        <button
+          type="button"
+          className="logo"
+          onClick={async () => {
+            await close()
+            go('home')
+          }}
+          aria-label="Home"
+        >
           <span className="logo__notes" aria-hidden>
             🎵
           </span>

@@ -423,3 +423,80 @@
 .parent-panel__label {
   width: 110px;
 }
+
+/* ---------- Song cards ---------- */
+.song-card {
+  --card: var(--berry);
+  --card-soft: var(--berry-soft);
+  display: grid;
+  grid-template-rows: 1fr auto;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  border-top: 10px solid var(--card);
+}
+.song-card__open {
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  gap: 4px;
+  border: 0;
+  background: var(--card-soft);
+  padding: 20px 22px;
+  text-align: left;
+  cursor: pointer;
+  transition: filter 0.12s ease;
+}
+.song-card__open:hover {
+  filter: brightness(1.03);
+}
+.song-card__emoji {
+  font-size: 56px;
+  line-height: 1.1;
+}
+.song-card__title {
+  font-weight: 700;
+  font-size: var(--text);
+  line-height: 1.3;
+}
+.song-card__when {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+.song-card__tools,
+.song-card__confirm,
+.song-card__rename {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+}
+.song-card__tools button,
+.song-card__confirm button,
+.song-card__rename button {
+  border: 0;
+  background: var(--surface-2);
+  border-radius: 12px;
+  font-size: 22px;
+  min-width: 46px;
+  height: 46px;
+  cursor: pointer;
+  padding: 0 10px;
+}
+.song-card__confirm {
+  font-size: var(--text-sm);
+}
+.song-card__confirm span {
+  flex: 1;
+}
+.song-card__confirm button {
+  font-size: var(--text-sm);
+}
+.song-card__rename input {
+  flex: 1;
+  min-width: 0;
+  border: 3px solid var(--card);
+  border-radius: 12px;
+  padding: 6px 10px;
+}
