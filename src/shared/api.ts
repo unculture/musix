@@ -24,6 +24,7 @@ export interface PublicSettings {
   /** Daily cap on AI music tracks, set by the parent. */
   magicPerDay: number
   magicLeft: number
+  appVersion: string
 }
 
 export interface KeyStatus {
@@ -76,6 +77,11 @@ export type Result<T> = { ok: true; value: T } | { ok: false; error: string }
 export interface MusixApi {
   platform: NodeJS.Platform
   versions: { app: string; electron: string }
+  updates: {
+    /** Called when a new version has downloaded; it installs when the app is closed. */
+    onReady(callback: (version: string) => void): () => void
+    restartNow(): Promise<void>
+  }
   settings: {
     get(): Promise<PublicSettings>
     setKey(key: string | null): Promise<PublicSettings>

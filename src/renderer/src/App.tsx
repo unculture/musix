@@ -14,6 +14,7 @@ import { WordsScreen } from './screens/WordsScreen'
 import { useNav, type Screen } from './state/nav'
 import { usePrefs } from './state/prefs'
 import { useProject } from './state/project'
+import { toast } from './state/toast'
 
 const SCREENS: Record<Screen, () => React.JSX.Element> = {
   home: HomeScreen,
@@ -50,6 +51,14 @@ export default function App(): React.JSX.Element {
   useEffect(() => {
     document.documentElement.dataset.font = font
   }, [font])
+
+  useEffect(
+    () =>
+      window.musix.updates.onReady(() =>
+        toast('Musix has a new surprise! You will see it next time you open the app.', '🎁')
+      ),
+    []
+  )
 
   return (
     <div className="app">

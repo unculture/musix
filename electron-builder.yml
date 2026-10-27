@@ -6,8 +6,6 @@ directories:
 files:
   - out/**
   - package.json
-asarUnpack:
-  - resources/**
 extraResources:
   - from: resources
     to: resources
@@ -34,3 +32,8 @@ fileAssociations:
     name: Musix song
     description: A song made with Musix
     role: Editor
+publish:
+  provider: github
+  owner: unculture
+  repo: musix
+  releaseType: release

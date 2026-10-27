@@ -5,6 +5,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { importFile } from './archive'
 import { queueImported, registerIpc } from './ipc'
 import { handleProtocol, registerSchemes } from './protocol'
+import { startUpdater } from './updater'
 
 registerSchemes()
 
@@ -98,6 +99,7 @@ app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.unculture.musix')
   registerIpc()
   handleProtocol()
+  startUpdater()
   app.on('browser-window-created', (_, window) => optimizer.watchWindowShortcuts(window))
   createWindow()
   app.on('activate', () => {
