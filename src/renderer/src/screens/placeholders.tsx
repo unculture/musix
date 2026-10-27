@@ -1,12 +1,5 @@
 import { StepScreen } from '@/components/StepScreen'
 
-export const StyleScreen = (): React.JSX.Element => (
-  <StepScreen
-    step="style"
-    title="Pick a style"
-    help="What kind of song is it? Pick a picture or tell me."
-  />
-)
 export const HumScreen = (): React.JSX.Element => (
   <StepScreen
     step="hum"
