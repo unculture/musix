@@ -3,6 +3,9 @@ import { join } from 'node:path'
 import { writeFileSync } from 'node:fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { registerIpc } from './ipc'
+import { handleProtocol, registerSchemes } from './protocol'
+
+registerSchemes()
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -26,6 +29,7 @@ function createWindow(): void {
   // Dev aid: MUSIX_SCREENSHOT=out.png captures the window after load, then quits.
   const shot = process.env['MUSIX_SCREENSHOT']
   if (shot) {
+    win.webContents.on('console-message', (e) => console.log('[renderer]', (e as unknown as { message: string }).message))
     win.webContents.on('did-finish-load', async () => {
       if (process.env['MUSIX_SCREENSHOT_JS']) {
         await win.webContents.executeJavaScript(process.env['MUSIX_SCREENSHOT_JS'])
@@ -50,6 +54,7 @@ function createWindow(): void {
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.unculture.musix')
   registerIpc()
+  handleProtocol()
   app.on('browser-window-created', (_, window) => optimizer.watchWindowShortcuts(window))
   createWindow()
   app.on('activate', () => {
