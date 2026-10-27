@@ -17,3 +17,11 @@ describe('encodeMp3', () => {
     expect(mp3.length).toBeLessThan(40_000)
   })
 })
+
+describe('id3 cover', () => {
+  it('adds an APIC frame', () => {
+    const tag = id3({ title: 'x', cover: new Uint8Array([0x89, 0x50, 0x4e, 0x47, 1, 2, 3]) })
+    expect(new TextDecoder().decode(tag)).toContain('APIC')
+    expect(new TextDecoder().decode(tag)).toContain('image/png')
+  })
+})

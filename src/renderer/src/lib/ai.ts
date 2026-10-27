@@ -29,3 +29,7 @@ export async function aiTranscribe(req: TranscribeRequest): Promise<string | nul
 export async function aiMusic(projectId: string, prompt: string): Promise<string | null> {
   return friendly(await window.musix.ai.music(projectId, prompt))
 }
+
+export async function aiCover(projectId: string, prompt: string): Promise<string | null> {
+  return friendly(await window.musix.ai.cover(projectId, prompt))
+}

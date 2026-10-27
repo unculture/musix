@@ -42,3 +42,23 @@ export function magicPrompt(project: Project, mode: MagicMode): string {
     .filter(Boolean)
     .join('\n')
 }
+
+/** Prompt for a cover picture. Always child-safe and without text (models misspell words). */
+export function coverPrompt(project: Project): string {
+  const preset = presetById(project.style.preset)
+  const words = project.lyrics
+    .flatMap((s) => s.lines.map((l) => l.text.trim()))
+    .filter(Boolean)
+    .slice(0, 6)
+    .join(' / ')
+  return [
+    `Square album cover illustration for a children's song called "${project.title}".`,
+    words ? `The song is about: ${words}` : '',
+    preset ? `Music style: ${preset.label}.` : '',
+    project.style.mood ? `Feeling: ${MOOD_INFO[project.style.mood].label.toLowerCase()}.` : '',
+    'Bright, colourful, playful and friendly picture-book style. Completely child-safe.',
+    'Absolutely no text, letters, numbers or words anywhere in the image.'
+  ]
+    .filter(Boolean)
+    .join('\n')
+}

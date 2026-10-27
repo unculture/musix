@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { usePlayer } from '@/audio/player'
 import { BigButton } from '@/components/BigButton'
 import { ExportButton } from '@/components/ExportButton'
+import { CoverMaker } from '@/components/CoverMaker'
 import { Karaoke } from '@/components/Karaoke'
 import { MagicBand } from '@/components/MagicBand'
 import { VocalRecorder } from '@/components/VocalRecorder'
@@ -99,6 +100,7 @@ export function PlayScreen(): React.JSX.Element {
         </div>
         <VocalRecorder />
         <MagicBand />
+        <CoverMaker />
         <div className="play__edit-toggle">
           <BigButton
             icon={editing ? '✅' : '🎛️'}

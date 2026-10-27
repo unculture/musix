@@ -160,3 +160,17 @@ export async function generateMusic(key: string, prompt: string, model: string):
   if (!chunks.length) throw new OpenRouterError('No audio came back')
   return Buffer.from(chunks.join(''), 'base64')
 }
+
+/** Generate a picture; returns PNG/JPEG bytes. */
+export async function generateImage(key: string, prompt: string, model: string): Promise<Buffer> {
+  const json = await post(key, '/chat/completions', {
+    model,
+    modalities: ['image', 'text'],
+    messages: [{ role: 'user', content: prompt }]
+  })
+  const choices = json.choices as
+    Array<{ message?: { images?: { image_url?: { url?: string } }[] } }> | undefined
+  const url = choices?.[0]?.message?.images?.[0]?.image_url?.url
+  if (!url?.startsWith('data:')) throw new OpenRouterError('No picture came back')
+  return Buffer.from(url.slice(url.indexOf(',') + 1), 'base64')
+}

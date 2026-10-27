@@ -46,7 +46,8 @@ const api: MusixApi = {
   ai: {
     chat: (req) => ipcRenderer.invoke('ai:chat', req),
     transcribe: (req) => ipcRenderer.invoke('ai:transcribe', req),
-    music: (projectId, prompt) => ipcRenderer.invoke('ai:music', projectId, prompt)
+    music: (projectId, prompt) => ipcRenderer.invoke('ai:music', projectId, prompt),
+    cover: (projectId, prompt) => ipcRenderer.invoke('ai:cover', projectId, prompt)
   }
 }
 

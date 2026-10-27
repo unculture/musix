@@ -1230,3 +1230,65 @@
   outline: 4px solid var(--ink);
   z-index: 1;
 }
+
+/* ---------- Cover ---------- */
+.cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+.cover__img,
+.cover__empty {
+  width: 140px;
+  height: 140px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  box-shadow: var(--shadow);
+}
+.cover__empty {
+  display: grid;
+  place-items: center;
+  font-size: 72px;
+  background: var(--surface-2);
+}
+.song-card__cover {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- Lyric ideas ---------- */
+.lyric-card__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+.ideas {
+  display: grid;
+  gap: 10px;
+  flex: 1;
+  min-width: 300px;
+  background: var(--sun-soft);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+.ideas__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.ideas__label {
+  font-weight: 700;
+  font-size: var(--text-sm);
+  min-width: 130px;
+}
+.ideas__busy {
+  font-weight: 700;
+}
+.idea {
+  font-weight: 500;
+}
