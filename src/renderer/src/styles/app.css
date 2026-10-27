@@ -1169,3 +1169,64 @@
   justify-content: space-between;
   gap: 16px;
 }
+
+/* ---------- Melody editor ---------- */
+.melody {
+  display: grid;
+  gap: 12px;
+}
+.melody__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 56px;
+}
+.melody__hint {
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+.melody__scroll {
+  overflow-x: auto;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 8px;
+}
+.melody__grid {
+  position: relative;
+}
+.melody__cell {
+  position: absolute;
+  border: 0;
+  border-left: 1px solid #f3eadb;
+  border-bottom: 1px solid #f3eadb;
+  background: transparent;
+  cursor: pointer;
+}
+.melody__cell:active {
+  background: var(--surface-2);
+}
+.melody__cell--bar {
+  border-left: 3px solid var(--line);
+}
+.melody__note {
+  --note: var(--berry);
+  position: absolute;
+  border: 0;
+  border-radius: 12px;
+  background: var(--note);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 0 6px;
+  cursor: pointer;
+  box-shadow: var(--shadow-press);
+}
+.melody__note--on {
+  outline: 4px solid var(--ink);
+  z-index: 1;
+}

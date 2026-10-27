@@ -1,6 +1,14 @@
-import { newId, type PartRole, type PlanSection, type SectionKind, type SongPlan } from '../project'
+import {
+  newId,
+  type Note,
+  type PartRole,
+  type PlanSection,
+  type SectionKind,
+  type SongPlan
+} from '../project'
 import {
   diatonicChord,
+  inScale,
   mod12,
   parseChord,
   pcName,
@@ -147,3 +155,71 @@ export function surpriseChord(plan: SongPlan, current: string, rand = Math.rando
 
 export const keyLabel = (plan: SongPlan): string => `${plan.key} ${plan.scale}`
 export const semitoneName = (n: number): string => pcName(mod12(n))
+
+// ---------------------------------------------------------------------------------------------
+// Melody editing — notes always stay in the key, so whatever she does sounds good.
+
+/** Scale notes in a comfortable singing range, low to high. */
+export function melodyRows(plan: SongPlan): number[] {
+  const rows: number[] = []
+  for (let m = VOICE_LOW - 2; m <= VOICE_HIGH + 2; m++)
+    if (inScale(m, plan.key, plan.scale)) rows.push(m)
+  return rows
+}
+
+function editMelody(plan: SongPlan, si: number, fn: (notes: Note[]) => Note[]): SongPlan {
+  const s = plan.sections[si]
+  if (!s) return plan
+  const beats = s.bars * plan.beatsPerBar
+  const notes = fn(s.melody.map((n) => ({ ...n })))
+    .filter((n) => n.start >= 0 && n.start < beats)
+    .map((n) => ({ ...n, duration: Math.min(n.duration, beats - n.start) }))
+    .sort((a, b) => a.start - b.start)
+  return updateSection(plan, si, { melody: notes })
+}
+
+/** Move a note up or down by scale steps. */
+export function stepNote(plan: SongPlan, si: number, ni: number, steps: number): SongPlan {
+  const rows = melodyRows(plan)
+  return editMelody(plan, si, (notes) => {
+    const n = notes[ni]
+    if (!n) return notes
+    const at = rows.reduce(
+      (best, r, i) => (Math.abs(r - n.pitch) < Math.abs(rows[best] - n.pitch) ? i : best),
+      0
+    )
+    n.pitch = rows[Math.max(0, Math.min(rows.length - 1, at + steps))]
+    return notes
+  })
+}
+
+export function shiftNote(plan: SongPlan, si: number, ni: number, beats: number): SongPlan {
+  return editMelody(plan, si, (notes) => {
+    if (notes[ni]) notes[ni].start = Math.max(0, notes[ni].start + beats)
+    return notes
+  })
+}
+
+export function resizeNote(plan: SongPlan, si: number, ni: number, beats: number): SongPlan {
+  return editMelody(plan, si, (notes) => {
+    if (notes[ni]) notes[ni].duration = Math.max(0.5, notes[ni].duration + beats)
+    return notes
+  })
+}
+
+export function deleteNote(plan: SongPlan, si: number, ni: number): SongPlan {
+  return editMelody(plan, si, (notes) => notes.filter((_, i) => i !== ni))
+}
+
+export function addNote(
+  plan: SongPlan,
+  si: number,
+  start: number,
+  pitch: number,
+  duration = 1
+): SongPlan {
+  return editMelody(plan, si, (notes) => [
+    ...notes.filter((n) => n.start !== start),
+    { pitch, start, duration, velocity: 0.8, syllable: '~' }
+  ])
+}
