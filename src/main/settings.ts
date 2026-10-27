@@ -7,7 +7,13 @@ interface StoredSettings {
   /** OpenRouter key, encrypted with safeStorage and base64-encoded. */
   encryptedKey?: string
   models?: Partial<ModelSettings>
+  /** Parent's cap on AI music tracks per day (they cost real money). */
+  magicPerDay?: number
+  magicUsed?: { date: string; count: number }
 }
+
+export const DEFAULT_MAGIC_PER_DAY = 10
+const today = (): string => new Date().toISOString().slice(0, 10)
 
 const file = (): string => join(app.getPath('userData'), 'settings.json')
 
@@ -49,7 +55,9 @@ export function getPublicSettings(): PublicSettings {
   return {
     hasKey: Boolean(stored ?? env),
     keySource: stored ? 'stored' : env ? 'env' : 'none',
-    models: getModels()
+    models: getModels(),
+    magicPerDay: read().magicPerDay ?? DEFAULT_MAGIC_PER_DAY,
+    magicLeft: magicLeft()
   }
 }
 
@@ -71,4 +79,20 @@ export function setModels(models: Partial<ModelSettings>): void {
   )
   settings.models = { ...settings.models, ...cleaned }
   write(settings)
+}
+
+export function magicLeft(): number {
+  const s = read()
+  const used = s.magicUsed?.date === today() ? s.magicUsed.count : 0
+  return Math.max(0, (s.magicPerDay ?? DEFAULT_MAGIC_PER_DAY) - used)
+}
+
+export function recordMagicUse(): void {
+  const s = read()
+  const count = s.magicUsed?.date === today() ? s.magicUsed.count : 0
+  write({ ...s, magicUsed: { date: today(), count: count + 1 } })
+}
+
+export function setMagicPerDay(n: number): void {
+  write({ ...read(), magicPerDay: Math.max(0, Math.min(100, Math.round(n))) })
 }

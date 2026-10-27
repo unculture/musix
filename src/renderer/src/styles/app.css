@@ -1088,3 +1088,16 @@
   min-width: 120px;
   text-align: center;
 }
+
+/* ---------- Magic band ---------- */
+.magic {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+}
+.magic__sources {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}

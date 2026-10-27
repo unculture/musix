@@ -118,3 +118,45 @@ export async function testKey(key: string): Promise<KeyStatus> {
   const { data } = (await res.json()) as { data?: { limit_remaining?: number | null } }
   return { ok: true, remaining: data?.limit_remaining ?? null }
 }
+
+/** Generate music (e.g. Lyria). Audio output only works when streaming; returns the MP3 bytes. */
+export async function generateMusic(key: string, prompt: string, model: string): Promise<Buffer> {
+  const res = await fetch(`${BASE}/chat/completions`, {
+    method: 'POST',
+    headers: headers(key),
+    body: JSON.stringify({
+      model,
+      stream: true,
+      modalities: ['text', 'audio'],
+      messages: [{ role: 'user', content: prompt }]
+    })
+  })
+  if (!res.ok || !res.body) {
+    const json = (await res.json().catch(() => ({}))) as { error?: { message?: string } }
+    throw new OpenRouterError(json.error?.message ?? res.statusText, res.status)
+  }
+  const chunks: string[] = []
+  let buffered = ''
+  const decoder = new TextDecoder()
+  const reader = res.body.getReader()
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    buffered += decoder.decode(value, { stream: true })
+    let nl: number
+    while ((nl = buffered.indexOf('\n')) >= 0) {
+      const line = buffered.slice(0, nl).trim()
+      buffered = buffered.slice(nl + 1)
+      if (!line.startsWith('data: ') || line === 'data: [DONE]') continue
+      const event = JSON.parse(line.slice(6)) as {
+        error?: { message?: string }
+        choices?: { delta?: { audio?: { data?: string } } }[]
+      }
+      if (event.error) throw new OpenRouterError(event.error.message ?? 'Music generation failed')
+      const data = event.choices?.[0]?.delta?.audio?.data
+      if (data) chunks.push(data)
+    }
+  }
+  if (!chunks.length) throw new OpenRouterError('No audio came back')
+  return Buffer.from(chunks.join(''), 'base64')
+}

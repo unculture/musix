@@ -107,7 +107,9 @@ export async function buildSong(
     const player = new Tone.Player(
       `musix://song/${opts.projectId}/${encodeURIComponent(layer.file)}`
     ).connect(channel)
-    player.sync().start(Math.max(0, layer.offset))
+    // A negative offset trims the start of the audio so its first beat lands on the song's first beat.
+    if (layer.offset >= 0) player.sync().start(layer.offset)
+    else player.sync().start(0, -layer.offset)
     layerChannels[layer.id] = channel
     layerPlayers.push({ layer, player })
     disposables.push(player, channel)

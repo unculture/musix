@@ -5,7 +5,16 @@ import type { ChatRequest, ModelSettings, Result, TranscribeRequest } from '@sha
 import type { Project } from '@shared/project'
 import * as openrouter from './openrouter'
 import * as projects from './projects'
-import { getApiKey, getModels, getPublicSettings, setApiKey, setModels } from './settings'
+import {
+  getApiKey,
+  getModels,
+  getPublicSettings,
+  magicLeft,
+  setApiKey,
+  setMagicPerDay,
+  setModels,
+  recordMagicUse
+} from './settings'
 
 async function wrap<T>(fn: () => Promise<T>): Promise<Result<T>> {
   try {
@@ -42,6 +51,19 @@ export function registerIpc(): void {
     return getPublicSettings()
   })
 
+  ipcMain.handle('settings:setMagicPerDay', (_e, n: number) => {
+    setMagicPerDay(n)
+    return getPublicSettings()
+  })
+  ipcMain.handle('ai:music', (_e, projectId: string, prompt: string) =>
+    wrap(async () => {
+      const key = requireKey()
+      if (magicLeft() <= 0) throw new Error('MAGIC_LIMIT')
+      const mp3 = await openrouter.generateMusic(key, prompt, getModels().music)
+      recordMagicUse()
+      return projects.writeAudio(projectId, `magic-${Date.now()}.mp3`, mp3)
+    })
+  )
   ipcMain.handle('ai:chat', (_e, req: ChatRequest) =>
     wrap(() => openrouter.chat(requireKey(), req, getModels().text))
   )

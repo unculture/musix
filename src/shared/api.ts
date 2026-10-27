@@ -21,6 +21,9 @@ export interface PublicSettings {
   /** Where the key came from — the parent settings screen, or an env var during development. */
   keySource: 'stored' | 'env' | 'none'
   models: ModelSettings
+  /** Daily cap on AI music tracks, set by the parent. */
+  magicPerDay: number
+  magicLeft: number
 }
 
 export interface KeyStatus {
@@ -78,6 +81,7 @@ export interface MusixApi {
     setKey(key: string | null): Promise<PublicSettings>
     testKey(key?: string): Promise<KeyStatus>
     setModels(models: Partial<ModelSettings>): Promise<PublicSettings>
+    setMagicPerDay(n: number): Promise<PublicSettings>
   }
   media: {
     /** Ask the OS for microphone access (macOS shows a prompt the first time). */
@@ -100,5 +104,7 @@ export interface MusixApi {
   ai: {
     chat(req: ChatRequest): Promise<Result<ChatResult>>
     transcribe(req: TranscribeRequest): Promise<Result<string>>
+    /** Generate a music track with the music model and save it in the song's audio folder. */
+    music(projectId: string, prompt: string): Promise<Result<string>>
   }
 }
