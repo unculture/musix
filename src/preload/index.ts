@@ -10,6 +10,9 @@ const api: MusixApi = {
     testKey: (key) => ipcRenderer.invoke('settings:testKey', key),
     setModels: (models) => ipcRenderer.invoke('settings:setModels', models)
   },
+  media: {
+    askMic: () => ipcRenderer.invoke('media:askMic')
+  },
   projects: {
     list: () => ipcRenderer.invoke('projects:list'),
     load: (id) => ipcRenderer.invoke('projects:load', id),

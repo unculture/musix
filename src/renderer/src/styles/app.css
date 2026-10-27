@@ -500,3 +500,120 @@
   border-radius: 12px;
   padding: 6px 10px;
 }
+
+/* ---------- Mic button ---------- */
+.mic-button {
+  --level: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 22px 10px 14px;
+  background: var(--sky);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 0.12s ease;
+}
+.mic-button:hover {
+  transform: translateY(-2px);
+}
+.mic-button__icon {
+  font-size: 28px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+}
+.mic-button--on {
+  background: var(--berry);
+  box-shadow: 0 0 0 calc(4px + var(--level) * 40px) rgba(232, 69, 122, 0.25);
+}
+.mic-button--thinking {
+  background: var(--grape);
+  cursor: wait;
+}
+.mic-button--thinking .mic-button__icon {
+  animation: bob 1.2s ease-in-out infinite;
+}
+.mic-button--lg {
+  font-size: var(--text-lg);
+  padding: 16px 32px 16px 18px;
+}
+.mic-button--lg .mic-button__icon {
+  width: 60px;
+  height: 60px;
+  font-size: 38px;
+}
+
+/* ---------- Lyrics ---------- */
+.lyrics {
+  display: grid;
+  gap: 22px;
+}
+.lyric-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border-left: 14px solid var(--sec);
+  box-shadow: var(--shadow);
+  padding: 16px 20px;
+  display: grid;
+  gap: 12px;
+}
+.lyric-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.lyric-card__kind {
+  border: 0;
+  background: var(--sec-soft);
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.lyric-card__tools {
+  display: flex;
+  gap: 6px;
+}
+.lyric-card__tools button {
+  border: 0;
+  background: var(--surface-2);
+  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  font-size: 20px;
+  cursor: pointer;
+}
+.lyric-card__tools button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.lyric-card__text {
+  width: 100%;
+  border: 3px solid var(--sec-soft);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  font-size: var(--text-lg);
+  line-height: 1.7;
+  resize: vertical;
+  background: #fffdf8;
+}
+.lyric-card__text:focus {
+  outline: none;
+  border-color: var(--sec);
+}
+.lyric-card__text::placeholder {
+  color: #b7ab98;
+}
+.lyrics__add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
