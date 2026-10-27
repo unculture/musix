@@ -25,6 +25,8 @@ function createWindow(): void {
   })
 
   win.on('ready-to-show', () => win.show())
+  // No pinch-zoom on touch screens; the layout is already big.
+  win.webContents.setVisualZoomLevelLimits(1, 1)
 
   // Dev aid: MUSIX_SCREENSHOT=out.png captures the window after load, then quits.
   const shot = process.env['MUSIX_SCREENSHOT']

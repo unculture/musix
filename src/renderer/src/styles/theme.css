@@ -77,6 +77,10 @@ body {
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   user-select: none;
+  /* Touch screen: no double-tap zoom delay, no long-press callouts. */
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 h1,
@@ -127,5 +131,46 @@ input[type='password'] {
   *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Big, finger-friendly sliders. */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  height: 44px;
+}
+input[type='range']::-webkit-slider-runnable-track {
+  height: 14px;
+  border-radius: 7px;
+  background: var(--line);
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 40px;
+  height: 40px;
+  margin-top: -13px;
+  border-radius: 50%;
+  background: var(--row, var(--grape));
+  border: 5px solid #fff;
+  box-shadow: var(--shadow);
+  cursor: grab;
+}
+
+/* On touch screens hover effects stick after a tap, so switch them off. */
+@media (hover: none) {
+  .big-button:hover:not(:disabled),
+  .icon-button:hover:not(:disabled),
+  .speak-button:hover,
+  .tile:hover,
+  .chip:hover,
+  .mic-button:hover,
+  .play-button:hover:not(:disabled) {
+    transform: none;
+    filter: none;
+  }
+  .tile--on {
+    transform: scale(1.04);
   }
 }
