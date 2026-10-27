@@ -7,7 +7,7 @@ import { createDrumVoice, createPitchedVoice, type DrumVoice, type PitchedVoice 
 // Used by the live player and by Tone.Offline for export.
 
 /** Base level of each part before the mixer, so a fresh song is already balanced. */
-const ROLE_GAIN: Record<PartRole, number> = {
+export const ROLE_GAIN: Record<PartRole, number> = {
   drums: 0.9,
   bass: 0.8,
   chords: 0.55,
@@ -126,5 +126,23 @@ export async function buildSong(
     channels,
     layerChannels,
     dispose: () => disposables.forEach((d) => d.dispose())
+  }
+}
+
+const level = (v: number): number => Tone.gainToDb(Math.max(0.0001, v))
+
+/** Apply volume / mute changes to a built song without rebuilding it. */
+export function applyMix(song: BuiltSong, plan: SongPlan, layers: AudioLayer[] = []): void {
+  for (const part of plan.parts) {
+    const ch = song.channels[part.role]
+    if (!ch) continue
+    ch.volume.rampTo(level(part.volume * ROLE_GAIN[part.role]), 0.05)
+    ch.mute = part.muted
+  }
+  for (const layer of layers) {
+    const ch = song.layerChannels[layer.id]
+    if (!ch) continue
+    ch.volume.rampTo(level(layer.volume), 0.05)
+    ch.mute = layer.muted
   }
 }
