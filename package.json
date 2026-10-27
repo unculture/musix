@@ -19,7 +19,8 @@
     "dist": "npm run build && electron-builder",
     "dist:mac": "npm run build && electron-builder --mac",
     "dist:win": "npm run build && electron-builder --win",
-    "dev:key": "OPENROUTER_API_KEY=$(tr -d '[:space:]' < openrouter-dev-musix-key.txt) electron-vite dev"
+    "dev:key": "OPENROUTER_API_KEY=$(tr -d '[:space:]' < openrouter-dev-musix-key.txt) electron-vite dev",
+    "samples": "node --experimental-strip-types scripts/fetch-samples.mts"
   },
   "repository": {
     "type": "git",
@@ -56,6 +57,7 @@
     "canvas-confetti": "^1.9.4",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
+    "tone": "^15.1.22",
     "zod": "^4.6.7",
     "zustand": "^5.0.16"
   },
