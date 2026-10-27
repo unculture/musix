@@ -1,0 +1,74 @@
+import { app, safeStorage } from 'electron'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { DEFAULT_MODELS, type ModelSettings, type PublicSettings } from '@shared/api'
+
+interface StoredSettings {
+  /** OpenRouter key, encrypted with safeStorage and base64-encoded. */
+  encryptedKey?: string
+  models?: Partial<ModelSettings>
+}
+
+const file = (): string => join(app.getPath('userData'), 'settings.json')
+
+function read(): StoredSettings {
+  try {
+    return existsSync(file()) ? (JSON.parse(readFileSync(file(), 'utf8')) as StoredSettings) : {}
+  } catch {
+    return {}
+  }
+}
+
+function write(settings: StoredSettings): void {
+  mkdirSync(dirname(file()), { recursive: true })
+  writeFileSync(file(), JSON.stringify(settings, null, 2))
+}
+
+function storedKey(): string | null {
+  const { encryptedKey } = read()
+  if (!encryptedKey || !safeStorage.isEncryptionAvailable()) return null
+  try {
+    return safeStorage.decryptString(Buffer.from(encryptedKey, 'base64'))
+  } catch {
+    return null
+  }
+}
+
+/** The key never leaves the main process. During development OPENROUTER_API_KEY can stand in. */
+export function getApiKey(): string | null {
+  return storedKey() ?? process.env['OPENROUTER_API_KEY'] ?? null
+}
+
+export function getModels(): ModelSettings {
+  return { ...DEFAULT_MODELS, ...read().models }
+}
+
+export function getPublicSettings(): PublicSettings {
+  const stored = storedKey()
+  const env = process.env['OPENROUTER_API_KEY']
+  return {
+    hasKey: Boolean(stored ?? env),
+    keySource: stored ? 'stored' : env ? 'env' : 'none',
+    models: getModels()
+  }
+}
+
+export function setApiKey(key: string | null): void {
+  const settings = read()
+  if (key && key.trim()) {
+    if (!safeStorage.isEncryptionAvailable()) throw new Error('Secure storage is not available')
+    settings.encryptedKey = safeStorage.encryptString(key.trim()).toString('base64')
+  } else {
+    delete settings.encryptedKey
+  }
+  write(settings)
+}
+
+export function setModels(models: Partial<ModelSettings>): void {
+  const settings = read()
+  const cleaned = Object.fromEntries(
+    Object.entries(models).filter(([, v]) => typeof v === 'string' && v.trim())
+  )
+  settings.models = { ...settings.models, ...cleaned }
+  write(settings)
+}
