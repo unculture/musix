@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { micOpened } from './speech'
 
 export interface Recording {
   blob: Blob
@@ -32,8 +33,11 @@ export function useRecorder({ raw = false }: { raw?: boolean } = {}): {
   const began = useRef(0)
   const raf = useRef(0)
   const ctx = useRef<AudioContext | null>(null)
+  const releaseMic = useRef<(() => void) | null>(null)
 
   const cleanup = useCallback(() => {
+    releaseMic.current?.()
+    releaseMic.current = null
     cancelAnimationFrame(raf.current)
     recorder.current?.stream.getTracks().forEach((t) => t.stop())
     ctx.current?.close()
@@ -51,6 +55,7 @@ export function useRecorder({ raw = false }: { raw?: boolean } = {}): {
           ? { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
           : { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
       })
+      releaseMic.current = micOpened()
       const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
         ? 'audio/webm;codecs=opus'
         : ''

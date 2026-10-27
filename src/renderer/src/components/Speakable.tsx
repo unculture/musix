@@ -6,8 +6,8 @@ const HOVER_DELAY_MS = 900
 const HOLD_MS = 550
 
 interface SpeakHandlers {
-  onMouseEnter: () => void
-  onMouseLeave: () => void
+  onPointerEnter: (e: React.PointerEvent) => void
+  onPointerLeave: () => void
   onPointerDown: (e: React.PointerEvent) => void
   onPointerUp: () => void
   onPointerCancel: () => void
@@ -28,15 +28,18 @@ export function useHoverSpeak(text: string): SpeakHandlers {
     holdTimer.current = null
   }
   return {
-    onMouseEnter: () => {
-      if (!readOnHover) return
+    // Only a real mouse hovers. A finger tap also sends "mouse enter" (and never "leave"), which
+    // used to read the label out a moment after every tap — even after starting a recording.
+    onPointerEnter: (e) => {
+      if (!readOnHover || e.pointerType !== 'mouse') return
       hoverTimer.current = setTimeout(() => speak(text), HOVER_DELAY_MS)
     },
-    onMouseLeave: () => {
+    onPointerLeave: () => {
       if (hoverTimer.current) clearTimeout(hoverTimer.current)
     },
     onPointerDown: (e) => {
       held.current = false
+      if (hoverTimer.current) clearTimeout(hoverTimer.current)
       if (e.pointerType === 'mouse') return
       clearHold()
       holdTimer.current = setTimeout(() => {

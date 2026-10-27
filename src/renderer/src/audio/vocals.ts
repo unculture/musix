@@ -1,4 +1,5 @@
 import * as Tone from 'tone'
+import { micOpened } from '@/lib/speech'
 
 // Records her voice in the same audio context as the song, so the take lines up with the music.
 
@@ -30,6 +31,7 @@ export async function startVocalSession(): Promise<VocalSession | null> {
   } catch {
     return null
   }
+  const releaseMic = micOpened()
   const ctx = Tone.getContext()
   const raw = ctx.rawContext as AudioContext
   const source = raw.createMediaStreamSource(stream)
@@ -50,6 +52,7 @@ export async function startVocalSession(): Promise<VocalSession | null> {
     stop: async () => {
       const blob = await recorder.stop()
       stream.getTracks().forEach((t) => t.stop())
+      releaseMic()
       source.disconnect()
       recorder.dispose()
       meter.dispose()
