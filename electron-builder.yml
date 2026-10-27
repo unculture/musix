@@ -29,3 +29,8 @@ nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
   artifactName: Musix-Setup-${version}.${ext}
+fileAssociations:
+  - ext: musix
+    name: Musix song
+    description: A song made with Musix
+    role: Editor

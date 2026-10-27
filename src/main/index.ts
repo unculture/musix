@@ -2,7 +2,8 @@ import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'node:path'
 import { writeFileSync } from 'node:fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { registerIpc } from './ipc'
+import { importFile } from './archive'
+import { queueImported, registerIpc } from './ipc'
 import { handleProtocol, registerSchemes } from './protocol'
 
 registerSchemes()
@@ -12,6 +13,38 @@ if (process.env['MUSIX_FAKE_MIC']) {
   app.commandLine.appendSwitch('use-fake-device-for-media-stream')
   app.commandLine.appendSwitch('use-fake-ui-for-media-stream')
 }
+
+// Opening .musix files from Finder / Explorer: import straight away, then let the window know.
+// The renderer also collects anything imported before it was ready (see files:takeImported).
+const musixArg = (argv: string[]): string[] =>
+  argv.filter((a) => a.toLowerCase().endsWith('.musix'))
+
+async function openSongFiles(paths: string[]): Promise<void> {
+  if (!paths.length) return
+  await app.whenReady()
+  for (const path of paths) {
+    try {
+      queueImported((await importFile(path)).id)
+    } catch (e) {
+      console.error('Could not open', path, e)
+    }
+  }
+  const win = BrowserWindow.getAllWindows()[0]
+  if (!win) return
+  win.webContents.send('song-imported')
+  if (win.isMinimized()) win.restore()
+  win.focus()
+}
+
+if (!app.requestSingleInstanceLock() && !process.env['MUSIX_SCREENSHOT']) {
+  app.quit()
+}
+app.on('second-instance', (_e, argv) => openSongFiles(musixArg(argv)))
+app.on('open-file', (e, path) => {
+  e.preventDefault()
+  openSongFiles([path])
+})
+openSongFiles(musixArg(process.argv.slice(1)))
 
 function createWindow(): void {
   const win = new BrowserWindow({
