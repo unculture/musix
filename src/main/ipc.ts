@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { ipcMain, systemPreferences } from 'electron'
 import type { ChatRequest, ModelSettings, Result, TranscribeRequest } from '@shared/api'
 import type { Project } from '@shared/project'
 import * as openrouter from './openrouter'
@@ -47,6 +47,11 @@ export function registerIpc(): void {
     wrap(() => openrouter.transcribe(requireKey(), req, getModels().transcribe))
   )
 
+  ipcMain.handle('media:askMic', async () => {
+    if (process.platform !== 'darwin') return true
+    if (systemPreferences.getMediaAccessStatus('microphone') === 'granted') return true
+    return systemPreferences.askForMediaAccess('microphone')
+  })
   ipcMain.handle('projects:list', () => projects.listProjects())
   ipcMain.handle('projects:load', (_e, id: string) => projects.loadProject(id))
   ipcMain.handle('projects:save', (_e, project: Project) => projects.saveProject(project))

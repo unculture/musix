@@ -79,6 +79,10 @@ export interface MusixApi {
     testKey(key?: string): Promise<KeyStatus>
     setModels(models: Partial<ModelSettings>): Promise<PublicSettings>
   }
+  media: {
+    /** Ask the OS for microphone access (macOS shows a prompt the first time). */
+    askMic(): Promise<boolean>
+  }
   projects: {
     list(): Promise<ProjectSummary[]>
     load(id: string): Promise<Project>
