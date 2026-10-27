@@ -22,6 +22,10 @@ const api: MusixApi = {
     writeAudio: (id, name, data) => ipcRenderer.invoke('projects:writeAudio', id, name, data),
     readAudio: (id, file) => ipcRenderer.invoke('projects:readAudio', id, file)
   },
+  files: {
+    saveMp3: (data, name) => ipcRenderer.invoke('files:saveMp3', data, name),
+    showInFolder: (path) => ipcRenderer.invoke('files:showInFolder', path)
+  },
   ai: {
     chat: (req) => ipcRenderer.invoke('ai:chat', req),
     transcribe: (req) => ipcRenderer.invoke('ai:transcribe', req)

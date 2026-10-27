@@ -46,15 +46,17 @@ export async function buildSong(
   const arrangement = arrange(plan)
   const sec = (beats: number): number => beatsToSeconds(beats, plan.bpm)
 
-  const limiter = new Tone.Limiter(-1).toDestination()
+  // Glue compressor → make-up gain → limiter, so songs sit at a normal listening level.
+  const limiter = new Tone.Limiter(-2).toDestination()
+  const makeup = new Tone.Gain(Tone.dbToGain(5)).connect(limiter)
   const master = new Tone.Compressor({
-    threshold: -16,
+    threshold: -18,
     ratio: 3,
     attack: 0.01,
     release: 0.2
-  }).connect(limiter)
+  }).connect(makeup)
   const reverb = new Tone.Reverb({ decay: 2.4, wet: 1 }).connect(master)
-  const disposables: { dispose: () => void }[] = [limiter, master, reverb]
+  const disposables: { dispose: () => void }[] = [limiter, makeup, master, reverb]
 
   const channels: BuiltSong['channels'] = {}
   const pitched: Partial<Record<PartRole, PitchedVoice>> = {}
@@ -95,6 +97,7 @@ export async function buildSong(
 
   // Recorded and AI-generated audio layers play in sync with the transport.
   const layerChannels: Record<string, Tone.Channel> = {}
+  const layerPlayers: { layer: AudioLayer; player: Tone.Player }[] = []
   for (const layer of opts.layers ?? []) {
     if (!opts.projectId) break
     const channel = new Tone.Channel({
@@ -106,18 +109,16 @@ export async function buildSong(
     ).connect(channel)
     player.sync().start(Math.max(0, layer.offset))
     layerChannels[layer.id] = channel
+    layerPlayers.push({ layer, player })
     disposables.push(player, channel)
   }
 
   await Promise.all([Tone.loaded(), reverb.ready])
 
   let duration = sec(arrangement.totalBeats) + TAIL_SECONDS
-  for (const layer of opts.layers ?? []) {
-    const ch = layerChannels[layer.id]
-    if (!ch) continue
-    // Make sure long audio layers aren't cut off.
-    duration = Math.max(duration, layer.offset + TAIL_SECONDS)
-  }
+  // Make sure long audio layers aren't cut off.
+  for (const { layer, player } of layerPlayers)
+    duration = Math.max(duration, layer.offset + player.buffer.duration + 0.5)
 
   return {
     arrangement,

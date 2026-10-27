@@ -29,7 +29,9 @@ function createWindow(): void {
   // Dev aid: MUSIX_SCREENSHOT=out.png captures the window after load, then quits.
   const shot = process.env['MUSIX_SCREENSHOT']
   if (shot) {
-    win.webContents.on('console-message', (e) => console.log('[renderer]', (e as unknown as { message: string }).message))
+    win.webContents.on('console-message', (e) =>
+      console.log('[renderer]', (e as unknown as { message: string }).message)
+    )
     win.webContents.on('did-finish-load', async () => {
       if (process.env['MUSIX_SCREENSHOT_JS']) {
         await win.webContents.executeJavaScript(process.env['MUSIX_SCREENSHOT_JS'])

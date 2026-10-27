@@ -92,6 +92,11 @@ export interface MusixApi {
     writeAudio(id: string, name: string, data: Uint8Array): Promise<string>
     readAudio(id: string, file: string): Promise<Uint8Array>
   }
+  files: {
+    /** Ask where to save, then write the MP3. Resolves to the saved path, or null if cancelled. */
+    saveMp3(data: Uint8Array, suggestedName: string): Promise<string | null>
+    showInFolder(path: string): Promise<void>
+  }
   ai: {
     chat(req: ChatRequest): Promise<Result<ChatResult>>
     transcribe(req: TranscribeRequest): Promise<Result<string>>

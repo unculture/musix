@@ -851,3 +851,15 @@
   min-width: 80px;
   font-variant-numeric: tabular-nums;
 }
+
+/* ---------- Export ---------- */
+.export-progress {
+  display: grid;
+  gap: 8px;
+  min-width: 320px;
+  font-weight: 700;
+}
+.export-done {
+  display: flex;
+  gap: 12px;
+}
