@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { usePlayer } from '@/audio/player'
 import { BigButton } from '@/components/BigButton'
+import { ExportButton } from '@/components/ExportButton'
 import { Karaoke } from '@/components/Karaoke'
 import { useHoverSpeak } from '@/components/Speakable'
 import { StepScreen } from '@/components/StepScreen'
@@ -65,7 +66,7 @@ export function PlayScreen(): React.JSX.Element {
           ? 'Getting the instruments ready…'
           : 'Press play and sing along! The words light up when it is time to sing them.'
       }
-      footer={<span />}
+      footer={<ExportButton />}
     >
       <div className="play">
         <Karaoke plan={plan} lyrics={project.lyrics} beat={beat} />

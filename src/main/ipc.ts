@@ -1,4 +1,6 @@
-import { ipcMain, systemPreferences } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, shell, systemPreferences } from 'electron'
+import { writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import type { ChatRequest, ModelSettings, Result, TranscribeRequest } from '@shared/api'
 import type { Project } from '@shared/project'
 import * as openrouter from './openrouter'
@@ -63,4 +65,27 @@ export function registerIpc(): void {
   ipcMain.handle('projects:readAudio', (_e, id: string, file: string) =>
     projects.readAudio(id, file)
   )
+
+  ipcMain.handle('files:saveMp3', async (e, data: Uint8Array, suggestedName: string) => {
+    const safe = suggestedName.replace(/[\\/:*?"<>|]+/g, '').trim() || 'My song'
+    // Dev aid for automated checks: skip the dialog.
+    const forced = process.env['MUSIX_EXPORT_PATH']
+    if (forced) {
+      await writeFile(forced, data)
+      return forced
+    }
+    const win = BrowserWindow.fromWebContents(e.sender)
+    const options = {
+      title: 'Save your song',
+      defaultPath: join(app.getPath('music'), `${safe}.mp3`),
+      filters: [{ name: 'MP3 audio', extensions: ['mp3'] }]
+    }
+    const { canceled, filePath } = win
+      ? await dialog.showSaveDialog(win, options)
+      : await dialog.showSaveDialog(options)
+    if (canceled || !filePath) return null
+    await writeFile(filePath, data)
+    return filePath
+  })
+  ipcMain.handle('files:showInFolder', (_e, path: string) => shell.showItemInFolder(path))
 }
