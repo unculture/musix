@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Musix — make songs from your own words</title>
+    <meta
+      name="description"
+      content="Musix is a free desktop app for young songwriters. Write or say your words, pick a style, hum a tune, and get a song to sing along to. For Mac and Windows."
+    />
+    <meta property="og:title" content="Musix — make songs from your own words" />
+    <meta
+      property="og:description"
+      content="Write or say your words, pick a style, hum a tune — and Musix makes a song you can sing to. Free for Mac and Windows."
+    />
+    <meta property="og:image" content="https://unculture.github.io/musix/img/play.jpg" />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="img/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Same palette as the app: warm cream, soft ink, one colour per step. */
+      :root {
+        color-scheme: light;
+        --bg: #fff8ec;
+        --surface: #ffffff;
+        --surface-2: #fdf0d9;
+        --ink: #2b2340;
+        --ink-soft: #5d5470;
+        --line: #eadcc2;
+        --berry: #e8457a;
+        --berry-soft: #fde2ec;
+        --sun: #ffb627;
+        --sun-soft: #fff0cc;
+        --sky: #3a9bdc;
+        --sky-soft: #ddeffb;
+        --leaf: #2fb67c;
+        --leaf-soft: #d9f4e8;
+        --grape: #8b5cf6;
+        --grape-soft: #ece4fe;
+        --radius: 24px;
+        --shadow: 0 4px 0 rgba(43, 35, 64, 0.12), 0 10px 24px rgba(43, 35, 64, 0.08);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: 'Lexend', system-ui, sans-serif;
+        font-size: 19px;
+        line-height: 1.6;
+        letter-spacing: 0.01em;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+      a {
+        color: inherit;
+      }
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      h1,
+      h2,
+      h3 {
+        line-height: 1.2;
+        margin: 0 0 12px;
+      }
+      h2 {
+        font-size: clamp(28px, 4vw, 40px);
+      }
+      p {
+        margin: 0 0 14px;
+      }
+      .soft {
+        color: var(--ink-soft);
+      }
+
+      /* Header */
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 0;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        font-size: 26px;
+        color: var(--berry);
+        text-decoration: none;
+      }
+      .brand img {
+        width: 44px;
+        height: 44px;
+      }
+      .top nav a {
+        margin-left: 20px;
+        font-weight: 500;
+        text-decoration: none;
+        color: var(--ink-soft);
+      }
+      .top nav a:hover {
+        color: var(--ink);
+      }
+
+      /* Hero */
+      .hero > *,
+      .feature > *,
+      .grownups .cols > * {
+        min-width: 0;
+      }
+      .hero {
+        display: grid;
+        grid-template-columns: 1fr 1.15fr;
+        gap: 48px;
+        align-items: center;
+        padding: 32px 0 64px;
+      }
+      .hero h1 {
+        font-size: clamp(40px, 6vw, 64px);
+        letter-spacing: -0.01em;
+      }
+      .hero h1 .pop {
+        background: linear-gradient(120deg, var(--sun), var(--berry) 55%, var(--grape));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .lead {
+        font-size: 22px;
+        color: var(--ink-soft);
+        margin-bottom: 28px;
+      }
+      .shot {
+        border-radius: 18px;
+        border: 3px solid var(--surface);
+        box-shadow: var(--shadow);
+        background: var(--surface);
+      }
+      .hero .shot {
+        transform: rotate(1.2deg);
+      }
+
+      /* Buttons */
+      .downloads {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 60px;
+        padding: 12px 24px;
+        border-radius: 999px;
+        font: inherit;
+        font-weight: 700;
+        text-decoration: none;
+        background: var(--surface);
+        color: var(--ink);
+        border: 3px solid var(--line);
+        box-shadow: var(--shadow);
+        transition: transform 0.15s;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      .btn:active {
+        transform: translateY(2px);
+      }
+      .btn--main {
+        background: var(--berry);
+        border-color: var(--berry);
+        color: #fff;
+      }
+      .btn small {
+        font-weight: 400;
+        opacity: 0.85;
+      }
+      .version {
+        margin-top: 14px;
+        font-size: 16px;
+        color: var(--ink-soft);
+      }
+
+      /* Steps */
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 14px;
+        margin: 8px 0 72px;
+        padding: 0;
+        list-style: none;
+      }
+      .step {
+        background: var(--soft);
+        border-radius: var(--radius);
+        padding: 22px 18px;
+        text-align: center;
+        border-bottom: 5px solid var(--c);
+      }
+      .step .icon {
+        font-size: 40px;
+        line-height: 1;
+      }
+      .step h3 {
+        margin: 10px 0 6px;
+        font-size: 22px;
+      }
+      .step p {
+        margin: 0;
+        font-size: 16px;
+        color: var(--ink-soft);
+      }
+
+      /* Feature rows */
+      .feature {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 48px;
+        align-items: center;
+        margin-bottom: 72px;
+      }
+      .feature:nth-of-type(even) .text {
+        order: 2;
+      }
+      .feature .tag {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 999px;
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        background: var(--soft);
+        color: var(--ink);
+      }
+      .ticks {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .ticks li {
+        padding-left: 34px;
+        position: relative;
+        margin-bottom: 8px;
+      }
+      .ticks li::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        top: 1px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--leaf-soft);
+        color: var(--leaf);
+        font-size: 15px;
+        font-weight: 700;
+        display: grid;
+        place-items: center;
+      }
+
+      /* Cards */
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-bottom: 72px;
+      }
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius);
+        padding: 26px;
+        box-shadow: var(--shadow);
+      }
+      .card .icon {
+        font-size: 34px;
+      }
+      .card h3 {
+        font-size: 21px;
+        margin-top: 8px;
+      }
+      .card p {
+        font-size: 17px;
+        color: var(--ink-soft);
+        margin: 0;
+      }
+
+      /* Grown-ups */
+      .grownups {
+        background: var(--surface-2);
+        border-radius: 32px;
+        padding: 44px;
+        margin-bottom: 72px;
+      }
+      .grownups .cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 36px;
+        margin-top: 20px;
+      }
+      .grownups h3 {
+        font-size: 20px;
+      }
+      .grownups p,
+      .grownups li {
+        font-size: 17px;
+      }
+      .grownups ol {
+        padding-left: 22px;
+        margin: 0 0 14px;
+      }
+      code {
+        background: var(--surface);
+        padding: 1px 6px;
+        border-radius: 6px;
+        font-size: 0.92em;
+      }
+
+      /* Closing */
+      .closing {
+        text-align: center;
+        padding: 20px 0 64px;
+      }
+      .closing .downloads {
+        justify-content: center;
+        margin-top: 22px;
+      }
+      footer {
+        border-top: 2px solid var(--line);
+        padding: 26px 0 40px;
+        font-size: 16px;
+        color: var(--ink-soft);
+      }
+      footer .wrap {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      @media (max-width: 900px) {
+        .hero,
+        .feature,
+        .grownups .cols {
+          grid-template-columns: 1fr;
+          gap: 28px;
+        }
+        .feature:nth-of-type(even) .text {
+          order: 0;
+        }
+        .steps {
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+        .cards {
+          grid-template-columns: 1fr;
+        }
+        .grownups {
+          padding: 28px 22px;
+        }
+        .top nav {
+          display: none;
+        }
+      }
+      @media (max-width: 480px) {
+        .wrap {
+          padding: 0 16px;
+        }
+        .btn {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .btn,
+        .hero .shot {
+          transition: none;
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <a class="brand" href="./"><img src="img/icon.png" alt="" /> Musix</a>
+        <nav>
+          <a href="#how">How it works</a>
+          <a href="#grown-ups">For grown-ups</a>
+          <a href="https://github.com/unculture/musix">GitHub</a>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <div>
+          <h1>Make songs from <span class="pop">your own words</span>.</h1>
+          <p class="lead">
+            Write or say your words, pick a style, hum a tune — and Musix turns it into a song you
+            can sing along to. Then change it, record yourself, and save it as an MP3.
+          </p>
+          <div class="downloads" data-downloads>
+            <a
+              class="btn btn--main"
+              data-os="mac"
+              href="https://github.com/unculture/musix/releases/latest"
+            >
+              <span aria-hidden="true">🍎</span> Download for Mac
+            </a>
+            <a class="btn" data-os="win" href="https://github.com/unculture/musix/releases/latest">
+              <span aria-hidden="true">🪟</span> Download for Windows
+            </a>
+          </div>
+          <p class="version" data-version>Free · Mac and Windows · updates itself</p>
+        </div>
+        <img
+          class="shot"
+          src="img/play.jpg"
+          alt="The Musix sing-along screen, showing the song Stars Over My Town with its words and a big play button"
+          width="1600"
+          height="1040"
+        />
+      </section>
+
+      <section id="how">
+        <h2>Five steps to your song</h2>
+        <p class="soft">Big buttons, colours for every step, and Mo the music monster to help.</p>
+        <ol class="steps">
+          <li class="step" style="--c: var(--berry); --soft: var(--berry-soft)">
+            <div class="icon" aria-hidden="true">✏️</div>
+            <h3>Words</h3>
+            <p>Type them, or just say them out loud.</p>
+          </li>
+          <li class="step" style="--c: var(--sun); --soft: var(--sun-soft)">
+            <div class="icon" aria-hidden="true">🎨</div>
+            <h3>Style</h3>
+            <p>Pop, rock, lullaby… or describe your own.</p>
+          </li>
+          <li class="step" style="--c: var(--sky); --soft: var(--sky-soft)">
+            <div class="icon" aria-hidden="true">🎤</div>
+            <h3>Hum</h3>
+            <p>Got a tune in your head? Hum it in.</p>
+          </li>
+          <li class="step" style="--c: var(--grape); --soft: var(--grape-soft)">
+            <div class="icon" aria-hidden="true">✨</div>
+            <h3>Make</h3>
+            <p>Chords, drums and a tune that fits your words.</p>
+          </li>
+          <li class="step" style="--c: var(--leaf); --soft: var(--leaf-soft)">
+            <div class="icon" aria-hidden="true">🎧</div>
+            <h3>Play</h3>
+            <p>Sing along as the words light up.</p>
+          </li>
+        </ol>
+      </section>
+
+      <section class="feature" style="--soft: var(--berry-soft)">
+        <div class="text">
+          <span class="tag">✏️ Words</span>
+          <h2>Your words, your song</h2>
+          <p class="soft">
+            Each part of the song gets its own coloured box — verse, chorus, bridge. Stuck for a
+            line? Tap <strong>Ideas</strong> for rhymes and next lines, and pick the one you like.
+          </p>
+          <ul class="ticks">
+            <li>Say it instead of typing it — speech-to-text built in</li>
+            <li>Rhyme and next-line ideas, never written for you</li>
+            <li>Undo for everything, so nothing is ever lost</li>
+          </ul>
+        </div>
+        <img
+          class="shot"
+          src="img/words.jpg"
+          alt="The Words screen with a verse and chorus in coloured boxes, a Say it microphone button and an Ideas button"
+          loading="lazy"
+          width="1600"
+          height="1040"
+        />
+      </section>
+
+      <section class="feature" style="--soft: var(--sun-soft)">
+        <div class="text">
+          <span class="tag">🎨 Style</span>
+          <h2>Pick a sound — or describe it</h2>
+          <p class="soft">
+            Tap a picture card to hear a quick taste. Choose a mood face and an animal speed, or
+            just tell Musix in your own words: “spooky but bouncy, like a haunted fairground.”
+          </p>
+          <ul class="ticks">
+            <li>Twelve styles, from pop and rock to lullaby and reggae</li>
+            <li>Change instruments, chords, speed and key whenever you like</li>
+            <li>Optional “magic band” for a studio-sounding backing track</li>
+          </ul>
+        </div>
+        <img
+          class="shot"
+          src="img/style.jpg"
+          alt="The Style screen with colourful picture cards for each music style"
+          loading="lazy"
+          width="1600"
+          height="1040"
+        />
+      </section>
+
+      <section class="cards">
+        <div class="card">
+          <div class="icon" aria-hidden="true">🔊</div>
+          <h3>Everything reads aloud</h3>
+          <p>
+            Tap the speaker, or press and hold anything, to hear it in a friendly natural voice.
+          </p>
+        </div>
+        <div class="card">
+          <div class="icon" aria-hidden="true">🔤</div>
+          <h3>Easy to read</h3>
+          <p>A clear, rounded font with an OpenDyslexic option, big text and calm colours.</p>
+        </div>
+        <div class="card">
+          <div class="icon" aria-hidden="true">👆</div>
+          <h3>Made for touch</h3>
+          <p>Big buttons and no fiddly dragging — works great on touch-screen laptops.</p>
+        </div>
+        <div class="card">
+          <div class="icon" aria-hidden="true">🎙️</div>
+          <h3>Sing and record</h3>
+          <p>Record yourself over the music, try lots of takes and star your favourite.</p>
+        </div>
+        <div class="card">
+          <div class="icon" aria-hidden="true">💾</div>
+          <h3>Save it and share it</h3>
+          <p>Export an MP3 with your cover picture, or save a <code>.musix</code> file to keep.</p>
+        </div>
+        <div class="card">
+          <div class="icon" aria-hidden="true">🏠</div>
+          <h3>Your songs stay yours</h3>
+          <p>No accounts, no sharing, no ads. Songs are saved on your own computer.</p>
+        </div>
+      </section>
+
+      <section class="grownups" id="grown-ups">
+        <h2>For grown-ups</h2>
+        <p class="soft">
+          Musix is free and open source. The song-making AI runs through
+          <a href="https://openrouter.ai">OpenRouter</a>, using your own key — so you stay in
+          control of what it costs.
+        </p>
+        <div class="cols">
+          <div>
+            <h3>Getting started</h3>
+            <ol>
+              <li>Download and install Musix (buttons above).</li>
+              <li>
+                Create a key at <a href="https://openrouter.ai/keys">openrouter.ai/keys</a> — you
+                can set a spending limit on it.
+              </li>
+              <li>
+                In Musix, open ⚙️ Settings, press and hold <strong>Grown-ups</strong>, answer the
+                sum, and paste the key.
+              </li>
+            </ol>
+            <p>
+              Without a key Musix still works: a built-in composer writes the music, words are typed
+              instead of spoken, and the computer’s own voice reads aloud.
+            </p>
+          </div>
+          <div>
+            <h3>What it costs</h3>
+            <p>
+              Composing a song and speech-to-text cost fractions of a cent. Natural read-aloud is
+              about $0.0002 per phrase, then free once it’s been heard. “Magic band” tracks and
+              cover pictures cost about $0.08 each, with a daily limit you set.
+            </p>
+            <h3>First launch</h3>
+            <p>
+              <strong>Mac:</strong> right-click the app and choose <em>Open</em> the first time.
+              <br />
+              <strong>Windows:</strong> if SmartScreen appears, choose
+              <em>More info → Run anyway</em>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="closing">
+        <h2>Ready to write your first song?</h2>
+        <div class="downloads" data-downloads>
+          <a
+            class="btn btn--main"
+            data-os="mac"
+            href="https://github.com/unculture/musix/releases/latest"
+          >
+            <span aria-hidden="true">🍎</span> Download for Mac
+          </a>
+          <a class="btn" data-os="win" href="https://github.com/unculture/musix/releases/latest">
+            <span aria-hidden="true">🪟</span> Download for Windows
+          </a>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <div class="wrap">
+        <span>🎵 Musix — free and open source</span>
+        <span>
+          <a href="https://github.com/unculture/musix">Source code</a> ·
+          <a href="https://github.com/unculture/musix/releases">All versions</a> ·
+          <a href="https://github.com/unculture/musix/blob/main/CREDITS.md">Credits</a>
+        </span>
+      </div>
+    </footer>
+
+    <script>
+      // Point the download buttons at the latest release's installers, and put the visitor's
+      // own system first. If anything fails, the buttons still go to the releases page.
+      ;(async () => {
+        const isWin = /Windows/i.test(navigator.userAgent)
+        if (isWin) {
+          document.querySelectorAll('[data-downloads]').forEach((group) => {
+            const win = group.querySelector('[data-os="win"]')
+            const mac = group.querySelector('[data-os="mac"]')
+            win.classList.add('btn--main')
+            mac.classList.remove('btn--main')
+            group.prepend(win)
+          })
+        }
+        try {
+          const res = await fetch('https://api.github.com/repos/unculture/musix/releases/latest')
+          if (!res.ok) return
+          const release = await res.json()
+          const find = (re) => release.assets.find((a) => re.test(a.name))
+          const files = { mac: find(/\.dmg$/), win: find(/Setup.*\.exe$/) }
+          document.querySelectorAll('[data-os]').forEach((link) => {
+            const file = files[link.dataset.os]
+            if (file) link.href = file.browser_download_url
+          })
+          const mb = (a) => (a ? ` · ${Math.round(a.size / 1e6)} MB` : '')
+          const version = document.querySelector('[data-version]')
+          version.textContent = `Free · version ${release.tag_name.replace(/^v/, '')}${mb(isWin ? files.win : files.mac)} · updates itself`
+        } catch {
+          // Offline or rate-limited: the fallback links are fine.
+        }
+      })()
+    </script>
+  </body>
+</html>
