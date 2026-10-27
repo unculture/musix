@@ -1,6 +1,8 @@
 import { ipcMain } from 'electron'
 import type { ChatRequest, ModelSettings, Result, TranscribeRequest } from '@shared/api'
+import type { Project } from '@shared/project'
 import * as openrouter from './openrouter'
+import * as projects from './projects'
 import { getApiKey, getModels, getPublicSettings, setApiKey, setModels } from './settings'
 
 async function wrap<T>(fn: () => Promise<T>): Promise<Result<T>> {
@@ -43,5 +45,17 @@ export function registerIpc(): void {
   )
   ipcMain.handle('ai:transcribe', (_e, req: TranscribeRequest) =>
     wrap(() => openrouter.transcribe(requireKey(), req, getModels().transcribe))
+  )
+
+  ipcMain.handle('projects:list', () => projects.listProjects())
+  ipcMain.handle('projects:load', (_e, id: string) => projects.loadProject(id))
+  ipcMain.handle('projects:save', (_e, project: Project) => projects.saveProject(project))
+  ipcMain.handle('projects:delete', (_e, id: string) => projects.deleteProject(id))
+  ipcMain.handle('projects:duplicate', (_e, id: string) => projects.duplicateProject(id))
+  ipcMain.handle('projects:writeAudio', (_e, id: string, name: string, data: Uint8Array) =>
+    projects.writeAudio(id, name, data)
+  )
+  ipcMain.handle('projects:readAudio', (_e, id: string, file: string) =>
+    projects.readAudio(id, file)
   )
 }

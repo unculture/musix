@@ -1,4 +1,5 @@
 // The typed bridge exposed to the renderer as `window.musix`.
+import type { Project, ProjectSummary } from './project'
 
 export interface ModelSettings {
   /** Text + structured output (composer, lyric helper). */
@@ -77,6 +78,15 @@ export interface MusixApi {
     setKey(key: string | null): Promise<PublicSettings>
     testKey(key?: string): Promise<KeyStatus>
     setModels(models: Partial<ModelSettings>): Promise<PublicSettings>
+  }
+  projects: {
+    list(): Promise<ProjectSummary[]>
+    load(id: string): Promise<Project>
+    save(project: Project): Promise<void>
+    delete(id: string): Promise<void>
+    duplicate(id: string): Promise<Project>
+    writeAudio(id: string, name: string, data: Uint8Array): Promise<string>
+    readAudio(id: string, file: string): Promise<Uint8Array>
   }
   ai: {
     chat(req: ChatRequest): Promise<Result<ChatResult>>
