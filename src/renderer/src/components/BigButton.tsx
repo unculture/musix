@@ -13,6 +13,8 @@ interface BigButtonProps {
   ink?: string
   /** What to read aloud, if different from the label. */
   say?: string
+  /** Show that the tap worked and something is on its way (spinner, no more taps). */
+  busy?: boolean
 }
 
 export function BigButton({
@@ -24,20 +26,22 @@ export function BigButton({
   variant = 'solid',
   disabled,
   say,
-  ink
+  ink,
+  busy
 }: BigButtonProps): React.JSX.Element {
   const hover = useHoverSpeak(say ?? label)
   return (
     <button
       type="button"
-      className={`big-button big-button--${size} big-button--${variant}`}
+      className={`big-button big-button--${size} big-button--${variant}${busy ? ' big-button--busy' : ''}`}
       style={{ '--btn': color, '--btn-ink': ink ?? '#fff' } as CSSProperties}
-      onClick={onClick}
+      onClick={busy ? undefined : onClick}
       disabled={disabled}
+      aria-busy={busy || undefined}
       {...hover}
     >
       <span className="big-button__icon" aria-hidden>
-        {icon}
+        {busy ? '⏳' : icon}
       </span>
       <span className="big-button__label">{label}</span>
     </button>

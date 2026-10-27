@@ -1,5 +1,5 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
-import { STEPS, useNav, type StepId } from '@/state/nav'
+import { STEPS, useNav, type Screen, type StepId } from '@/state/nav'
 import { usePrefs } from '@/state/prefs'
 import { BigButton } from './BigButton'
 import { Mascot } from './Mascot'
@@ -24,6 +24,13 @@ export function StepScreen({
   footer
 }: StepScreenProps): React.JSX.Element {
   const go = useNav((s) => s.go)
+  // Show the tap landed straight away: the next screen can take a moment to appear.
+  const [leaving, setLeaving] = useState<Screen | null>(null)
+  const leave = (to: Screen): void => {
+    if (leaving) return
+    setLeaving(to)
+    requestAnimationFrame(() => setTimeout(() => go(to), 0))
+  }
   // The first time she reaches each step, Mo reads the tip out loud.
   const [firstVisit] = useState(() => !usePrefs.getState().heard.includes(step))
   useEffect(() => {
@@ -52,7 +59,8 @@ export function StepScreen({
           label="Back"
           variant="soft"
           color="var(--ink-soft)"
-          onClick={() => go(prev ? prev.id : 'home')}
+          onClick={() => leave(prev ? prev.id : 'home')}
+          busy={leaving === (prev ? prev.id : 'home')}
         />
         {footer ??
           (next && (
@@ -60,7 +68,8 @@ export function StepScreen({
               icon="➡️"
               label="Next"
               color={next.color}
-              onClick={() => go(next.id)}
+              onClick={() => leave(next.id)}
+              busy={leaving === next.id}
               disabled={nextDisabled}
               say={`Next: ${next.label}`}
             />
